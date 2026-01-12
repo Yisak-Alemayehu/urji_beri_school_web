@@ -1,0 +1,87 @@
+{
+    "name": "Urji Beri School",
+    "short_name": "Urji Beri",
+    "description": "Quality preschool and elementary education in Alemgena, Oromia - Nurturing young minds for a brighter future",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#3679ff",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "icons": [
+        {
+            "src": "assets/images/icon-72.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "assets/images/icon-96.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "assets/images/icon-128.png",
+            "sizes": "128x128",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "assets/images/icon-144.png",
+            "sizes": "144x144",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "assets/images/icon-152.png",
+            "sizes": "152x152",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "assets/images/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "assets/images/icon-384.png",
+            "sizes": "384x384",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "assets/images/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["education", "kids"],
+    "lang": "en",
+    "dir": "ltr",
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "News & Events",
+            "short_name": "News",
+            "url": "/blog.php",
+            "icons": [{ "src": "assets/images/icon-96.png", "sizes": "96x96" }]
+        },
+        {
+            "name": "Photo Gallery",
+            "short_name": "Gallery",
+            "url": "/gallery.php",
+            "icons": [{ "src": "assets/images/icon-96.png", "sizes": "96x96" }]
+        },
+        {
+            "name": "Contact Us",
+            "short_name": "Contact",
+            "url": "/contact.php",
+            "icons": [{ "src": "assets/images/icon-96.png", "sizes": "96x96" }]
+        }
+    ],
+    "related_applications": [],
+    "prefer_related_applications": false
+}
