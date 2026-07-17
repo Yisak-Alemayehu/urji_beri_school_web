@@ -260,6 +260,43 @@ function upload_file($file, $directory, $allowedTypes = null) {
 }
 
 /**
+ * Normalize a single or multi-file $_FILES entry into an array of file arrays
+ */
+function normalize_uploaded_files($fieldName) {
+    $files = [];
+
+    if (!isset($_FILES[$fieldName])) {
+        return $files;
+    }
+
+    $file = $_FILES[$fieldName];
+
+    if (!is_array($file['name'])) {
+        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+            $files[] = $file;
+        }
+        return $files;
+    }
+
+    $count = count($file['name']);
+    for ($i = 0; $i < $count; $i++) {
+        if (($file['error'][$i] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+            continue;
+        }
+
+        $files[] = [
+            'name' => $file['name'][$i],
+            'type' => $file['type'][$i],
+            'tmp_name' => $file['tmp_name'][$i],
+            'error' => $file['error'][$i],
+            'size' => $file['size'][$i],
+        ];
+    }
+
+    return $files;
+}
+
+/**
  * Delete uploaded file
  */
 function delete_file($filename, $directory) {
@@ -268,6 +305,174 @@ function delete_file($filename, $directory) {
         return unlink($path);
     }
     return false;
+}
+
+/**
+ * Build a clean site URL
+ */
+function url($path = '', $params = []) {
+    $path = trim((string) $path, '/');
+
+    $url = $path === '' ? rtrim(SITE_URL, '/') . '/' : rtrim(SITE_URL, '/') . '/' . $path;
+
+    if (!empty($params)) {
+        $url .= '?' . http_build_query($params);
+    }
+
+    return $url;
+}
+
+/**
+ * Named route helper for clean URLs
+ */
+function route_url(string $name, array $params = []): string {
+    switch ($name) {
+        case 'home':
+        case 'index':
+            return url('');
+        case 'about':
+            return url('about');
+        case 'contact':
+            return url('contact');
+        case 'director':
+            return url('director');
+        case 'gallery':
+            if (!empty($params['category'])) {
+                return url('gallery/' . rawurlencode($params['category']));
+            }
+            return url('gallery');
+        case 'blog':
+            if (!empty($params['category'])) {
+                return url('blog/category/' . rawurlencode($params['category']));
+            }
+            return url('blog');
+        case 'blog-detail':
+            return url('blog/' . rawurlencode($params['slug'] ?? ''));
+        case 'sitemap':
+            return url('sitemap.xml');
+        default:
+            return url($name, $params);
+    }
+}
+
+/**
+ * Fetch paginated gallery images (newest first)
+ */
+function fetch_gallery_images(?string $categorySlug = null, int $page = 1, ?int $perPage = null): array {
+    $db = Database::getInstance();
+    $perPage = $perPage ?? GALLERY_PER_PAGE;
+    $page = max(1, $page);
+
+    $where = 'gi.is_active = 1 AND gc.is_active = 1';
+    $params = [];
+
+    if ($categorySlug) {
+        $where .= ' AND gc.slug = ?';
+        $params[] = $categorySlug;
+    }
+
+    $total = (int) $db->fetch(
+        "SELECT COUNT(*) as total
+         FROM gallery_images gi
+         JOIN gallery_categories gc ON gi.category_id = gc.id
+         WHERE {$where}",
+        $params
+    )['total'];
+
+    $totalPages = max(1, (int) ceil($total / $perPage));
+    $page = min($page, $totalPages);
+    $offset = ($page - 1) * $perPage;
+
+    $images = $db->fetchAll(
+        "SELECT gi.*, gc.name as category_name, gc.slug as category_slug
+         FROM gallery_images gi
+         JOIN gallery_categories gc ON gi.category_id = gc.id
+         WHERE {$where}
+         ORDER BY gi.created_at DESC, gi.id DESC
+         LIMIT {$perPage} OFFSET {$offset}",
+        $params
+    );
+
+    return [
+        'images' => $images,
+        'pagination' => [
+            'total' => $total,
+            'page' => $page,
+            'per_page' => $perPage,
+            'total_pages' => $totalPages,
+            'has_prev' => $page > 1,
+            'has_next' => $page < $totalPages,
+        ],
+    ];
+}
+
+/**
+ * Render gallery grid HTML
+ */
+function render_gallery_grid(array $images): string {
+    if (empty($images)) {
+        return '';
+    }
+
+    ob_start();
+    foreach ($images as $image) {
+        echo render_gallery_item($image);
+    }
+    return ob_get_clean();
+}
+
+/**
+ * Render a single gallery item
+ */
+function render_gallery_item(array $image): string {
+    $src = e(upload_url($image['filename'], 'gallery'));
+    $alt = e($image['alt_text'] ?: $image['caption'] ?: $image['category_name']);
+    $caption = e($image['caption'] ?: $image['category_name']);
+    $category = e($image['category_name']);
+    $captionText = $image['caption'] ? '<p>' . e($image['caption']) . '</p>' : '';
+
+    return <<<HTML
+<div class="gallery-item"
+     data-src="{$src}"
+     data-caption="{$caption}"
+     data-category="{$category}"
+     role="button"
+     tabindex="0"
+     aria-label="{$caption}">
+    <img src="{$src}" alt="{$alt}" loading="lazy">
+    <div class="gallery-item-overlay">
+        <div class="gallery-item-caption">
+            {$captionText}
+            <small>{$category}</small>
+        </div>
+    </div>
+</div>
+HTML;
+}
+
+/**
+ * Render AJAX gallery pagination controls
+ */
+function render_gallery_pagination(array $pagination, string $categorySlug = ''): string {
+    if ($pagination['total_pages'] <= 1) {
+        return '';
+    }
+
+    $html = '<div class="gallery-pagination pagination" data-category="' . e($categorySlug) . '" data-current-page="' . (int) $pagination['page'] . '" data-total-pages="' . (int) $pagination['total_pages'] . '">';
+    $html .= '<button type="button" class="pagination-btn gallery-page-btn" data-page="prev" ' . ($pagination['has_prev'] ? '' : 'disabled') . '>&laquo; Previous</button>';
+    $html .= '<div class="pagination-numbers">';
+
+    for ($i = 1; $i <= $pagination['total_pages']; $i++) {
+        $active = $i === (int) $pagination['page'] ? 'active' : '';
+        $html .= '<button type="button" class="pagination-num gallery-page-btn ' . $active . '" data-page="' . $i . '">' . $i . '</button>';
+    }
+
+    $html .= '</div>';
+    $html .= '<button type="button" class="pagination-btn gallery-page-btn" data-page="next" ' . ($pagination['has_next'] ? '' : 'disabled') . '>Next &raquo;</button>';
+    $html .= '<p class="gallery-pagination-status">Showing page ' . (int) $pagination['page'] . ' of ' . (int) $pagination['total_pages'] . ' · ' . (int) $pagination['total'] . ' photos</p>';
+    $html .= '</div>';
+
+    return $html;
 }
 
 /**
@@ -487,14 +692,15 @@ function generate_seo_meta($seo = []) {
  */
 function get_canonical_url() {
     $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    $path = rtrim($path, '/') ?: '/';
     $query = [];
     parse_str(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_QUERY) ?? '', $query);
 
-    // Keep only SEO-meaningful query params
-    $allowed = ['slug', 'category'];
+    // Keep only SEO-meaningful query params on non-clean legacy URLs
+    $allowed = ['page', 'search'];
     $filtered = array_intersect_key($query, array_flip($allowed));
 
-    $url = rtrim(SITE_URL, '/') . $path;
+    $url = rtrim(SITE_URL, '/') . ($path === '/' ? '/' : $path);
     if (!empty($filtered)) {
         $url .= '?' . http_build_query($filtered);
     }
@@ -764,7 +970,7 @@ function generate_contact_page_schema() {
         '@context' => 'https://schema.org',
         '@type' => 'ContactPage',
         'name' => 'Contact ' . $siteName,
-        'url' => $siteUrl . '/contact.php',
+        'url' => route_url('contact'),
         'description' => 'Contact ' . $siteName . ' for admissions, campus visits, and general inquiries.',
         'mainEntity' => [
             '@type' => 'School',
@@ -830,5 +1036,53 @@ function site_url_for($path) {
     if (preg_match('/^https?:\/\//i', $path)) {
         return $path;
     }
-    return rtrim(SITE_URL, '/') . '/' . ltrim($path, '/');
+
+    $path = ltrim((string) $path, '/');
+    $query = '';
+
+    if (str_contains($path, '?')) {
+        [$path, $query] = explode('?', $path, 2);
+    }
+
+    $legacyMap = [
+        '' => 'home',
+        'index.php' => 'home',
+        'about.php' => 'about',
+        'contact.php' => 'contact',
+        'director.php' => 'director',
+        'gallery.php' => 'gallery',
+        'blog.php' => 'blog',
+        'blog-detail.php' => 'blog-detail',
+        'sitemap.php' => 'sitemap',
+    ];
+
+    if (isset($legacyMap[$path])) {
+        $params = [];
+        if ($query !== '') {
+            parse_str($query, $params);
+        }
+
+        $route = $legacyMap[$path];
+
+        if ($route === 'blog-detail' && !empty($params['slug'])) {
+            return route_url('blog-detail', ['slug' => $params['slug']]);
+        }
+
+        if ($route === 'gallery' && !empty($params['category'])) {
+            return route_url('gallery', ['category' => $params['category']]);
+        }
+
+        if ($route === 'blog' && !empty($params['category'])) {
+            return route_url('blog', ['category' => $params['category']]);
+        }
+
+        return route_url($route);
+    }
+
+    $url = rtrim(SITE_URL, '/') . '/' . $path;
+    if ($query !== '') {
+        $url .= '?' . $query;
+    }
+
+    return $url;
 }

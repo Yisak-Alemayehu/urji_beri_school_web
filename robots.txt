@@ -37,7 +37,7 @@ Allow: /assets/js/
 Allow: /assets/images/
 
 # Sitemap location (works on any domain)
-Sitemap: /sitemap.php
+Sitemap: /sitemap.xml
 
 # Crawl delay (optional - be nice to servers)
 Crawl-delay: 1

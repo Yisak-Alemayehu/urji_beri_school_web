@@ -33,7 +33,15 @@ $recentMessages = $db->fetchAll(
 );
 
 include ADMIN_PATH . '/includes/admin_header.php';
+
+$greetingHour = (int) date('G');
+$greeting = $greetingHour < 12 ? 'Good morning' : ($greetingHour < 17 ? 'Good afternoon' : 'Good evening');
 ?>
+
+<div class="admin-welcome">
+    <h2><?php echo $greeting; ?>, <?php echo e(explode(' ', $currentUser['full_name'])[0]); ?></h2>
+    <p>Here's an overview of your site content and recent activity.</p>
+</div>
 
 <!-- Stats Row -->
 <div class="stats-row">
@@ -146,7 +154,7 @@ include ADMIN_PATH . '/includes/admin_header.php';
             <h2 class="admin-card-title">Recent Blog Posts</h2>
             <a href="<?php echo ADMIN_URL; ?>/blogs.php" class="btn btn-sm btn-outline">View All</a>
         </div>
-        <div class="admin-card-body" style="padding: 0;">
+        <div class="admin-card-body admin-card-body--flush">
             <?php if (!empty($recentPosts)): ?>
                 <table class="admin-table">
                     <thead>
@@ -193,7 +201,7 @@ include ADMIN_PATH . '/includes/admin_header.php';
             <h2 class="admin-card-title">Recent Messages</h2>
             <a href="<?php echo ADMIN_URL; ?>/messages.php" class="btn btn-sm btn-outline">View All</a>
         </div>
-        <div class="admin-card-body" style="padding: 0;">
+        <div class="admin-card-body admin-card-body--flush">
             <?php if (!empty($recentMessages)): ?>
                 <?php foreach ($recentMessages as $msg): ?>
                     <div class="message-item <?php echo !$msg['is_read'] ? 'unread' : ''; ?>">

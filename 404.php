@@ -24,7 +24,7 @@ include INCLUDES_PATH . '/header.php';
             <div class="page-header-content">
                 <h1 class="page-title">Page Not Found</h1>
                 <nav class="breadcrumb" aria-label="Breadcrumb">
-                    <a href="<?php echo SITE_URL; ?>">Home</a>
+                    <a href="<?php echo route_url('home'); ?>">Home</a>
                     <span class="breadcrumb-separator">/</span>
                     <span>404</span>
                 </nav>
@@ -41,8 +41,8 @@ include INCLUDES_PATH . '/header.php';
                     The link may be outdated or the page may have moved. Try the links below or return home.
                 </p>
                 <div class="btn-group justify-center">
-                    <a href="<?php echo SITE_URL; ?>" class="btn btn-primary">Back to Home</a>
-                    <a href="<?php echo SITE_URL; ?>/contact.php" class="btn btn-outline">Contact Us</a>
+                    <a href="<?php echo route_url('home'); ?>" class="btn btn-primary">Back to Home</a>
+                    <a href="<?php echo route_url('contact'); ?>" class="btn btn-outline">Contact Us</a>
                 </div>
             </div>
         </div>

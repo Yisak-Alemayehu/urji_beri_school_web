@@ -62,10 +62,10 @@ include INCLUDES_PATH . '/header.php';
                     <p class="hero-title"><?php echo e(get_setting('hero_title', 'Future-ready learning starts here')); ?></p>
                     <p class="hero-subtitle"><?php echo e(get_setting('site_description', 'A welcoming preschool and elementary community helping children ages 3 to 13 grow with confidence, curiosity, and strong foundations.')); ?></p>
                     <div class="hero-buttons">
-                        <a href="<?php echo e(get_setting('cta_primary_link', SITE_URL . '/about.php')); ?>" class="btn btn-white btn-lg">
+                        <a href="<?php echo e(site_url_for(get_setting('cta_primary_link', '/about.php'))); ?>" class="btn btn-white btn-lg">
                             <?php echo e(get_setting('cta_primary_text', 'Discover Our School')); ?>
                         </a>
-                        <a href="<?php echo SITE_URL; ?>/contact.php" class="btn btn-outline btn-lg">
+                        <a href="<?php echo route_url('contact'); ?>" class="btn btn-outline btn-lg">
                             Contact Admissions
                         </a>
                     </div>
@@ -242,7 +242,7 @@ include INCLUDES_PATH . '/header.php';
                         <span>Amharic</span>
                         <span>English</span>
                     </div>
-                    <a href="<?php echo SITE_URL; ?>/about.php" class="btn btn-primary">Read Our Story</a>
+                    <a href="<?php echo route_url('about'); ?>" class="btn btn-primary">Read Our Story</a>
                 </div>
             </div>
         </div>
@@ -275,10 +275,10 @@ include INCLUDES_PATH . '/header.php';
                             <span>By <?php echo e($post['author_name']); ?></span>
                         </div>
                         <h3 class="blog-card-title">
-                            <a href="<?php echo SITE_URL; ?>/blog-detail.php?slug=<?php echo e($post['slug']); ?>"><?php echo e($post['title']); ?></a>
+                            <a href="<?php echo route_url('blog-detail', ['slug' => $post['slug']]); ?>"><?php echo e($post['title']); ?></a>
                         </h3>
                         <p class="blog-card-excerpt"><?php echo e(truncate($post['excerpt'] ?: strip_tags($post['content']))); ?></p>
-                        <a href="<?php echo SITE_URL; ?>/blog-detail.php?slug=<?php echo e($post['slug']); ?>" class="blog-card-link">
+                        <a href="<?php echo route_url('blog-detail', ['slug' => $post['slug']]); ?>" class="blog-card-link">
                             Read More
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -291,7 +291,7 @@ include INCLUDES_PATH . '/header.php';
             </div>
             
             <div class="text-center mt-8">
-                <a href="<?php echo SITE_URL; ?>/blog.php" class="btn btn-outline">View All News</a>
+                <a href="<?php echo route_url('blog'); ?>" class="btn btn-outline">View All News</a>
             </div>
         </div>
     </section>
@@ -306,12 +306,17 @@ include INCLUDES_PATH . '/header.php';
                     <p class="section-kicker">Campus Life</p>
                     <h2 class="section-title">Moments families can feel.</h2>
                 </div>
-                <a href="<?php echo SITE_URL; ?>/gallery.php" class="section-link">View Gallery</a>
+                <a href="<?php echo route_url('gallery'); ?>" class="section-link">View Gallery</a>
             </div>
             
             <div class="gallery-grid anim-grid anim-grid-3d">
                 <?php foreach ($galleryImages as $image): ?>
-                <div class="gallery-item" data-src="<?php echo upload_url($image['filename'], 'gallery'); ?>" role="button" tabindex="0" aria-label="<?php echo e($image['caption'] ?: $image['category_name'] ?: 'View gallery image'); ?>">
+                <div class="gallery-item"
+                     data-src="<?php echo upload_url($image['filename'], 'gallery'); ?>"
+                     data-caption="<?php echo e($image['caption'] ?: $image['category_name']); ?>"
+                     role="button"
+                     tabindex="0"
+                     aria-label="<?php echo e($image['caption'] ?: $image['category_name'] ?: 'View gallery image'); ?>">
                     <img src="<?php echo upload_url($image['filename'], 'gallery'); ?>" alt="<?php echo e($image['alt_text'] ?: $image['caption']); ?>" loading="lazy">
                     <div class="gallery-item-overlay">
                         <div class="gallery-item-caption">
@@ -323,7 +328,7 @@ include INCLUDES_PATH . '/header.php';
             </div>
             
             <div class="text-center mt-8">
-                <a href="<?php echo SITE_URL; ?>/gallery.php" class="btn btn-outline">View Full Gallery</a>
+                <a href="<?php echo route_url('gallery'); ?>" class="btn btn-outline">View Full Gallery</a>
             </div>
         </div>
     </section>
@@ -342,7 +347,7 @@ include INCLUDES_PATH . '/header.php';
                     <span>Register</span>
                 </div>
                 <div class="btn-group justify-center">
-                    <a href="<?php echo SITE_URL; ?>/contact.php" class="btn btn-primary btn-lg">Contact Admissions</a>
+                    <a href="<?php echo route_url('contact'); ?>" class="btn btn-primary btn-lg">Contact Admissions</a>
                 </div>
             </div>
         </div>

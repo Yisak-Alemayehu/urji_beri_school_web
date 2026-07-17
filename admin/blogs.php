@@ -137,7 +137,7 @@ include ADMIN_PATH . '/includes/admin_header.php';
                             <td><?php echo format_date($post['created_at']); ?></td>
                             <td>
                                 <div class="admin-table-actions">
-                                    <a href="<?php echo SITE_URL; ?>/blog-detail.php?slug=<?php echo e($post['slug']); ?>" 
+                                    <a href="<?php echo route_url('blog-detail', ['slug' => $post['slug']]); ?>" 
                                        class="btn btn-sm btn-outline" target="_blank" title="View">
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>

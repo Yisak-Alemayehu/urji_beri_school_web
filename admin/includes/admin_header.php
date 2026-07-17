@@ -41,13 +41,13 @@ $unreadCount = $db->fetch("SELECT COUNT(*) as count FROM contact_messages WHERE 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="<?php echo asset_url('css/admin.css'); ?>?v=<?php echo time(); ?>">
 </head>
-<body>
+<body class="admin-app">
     <div class="admin-wrapper">
         <!-- Sidebar Overlay (Mobile) -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -57,7 +57,10 @@ $unreadCount = $db->fetch("SELECT COUNT(*) as count FROM contact_messages WHERE 
             <div class="admin-sidebar-header">
                 <a href="<?php echo ADMIN_URL; ?>" class="admin-logo">
                     <img src="<?php echo asset_url('images/logo.png'); ?>" alt="<?php echo e(get_setting('site_name')); ?>">
-                    <span class="admin-logo-text">Admin</span>
+                    <span class="admin-logo-text">
+                        <span class="admin-logo-name"><?php echo e(get_setting('site_name')); ?></span>
+                        <span class="admin-logo-badge">Admin Panel</span>
+                    </span>
                 </a>
             </div>
             
@@ -131,7 +134,7 @@ $unreadCount = $db->fetch("SELECT COUNT(*) as count FROM contact_messages WHERE 
                         </svg>
                         Messages
                         <?php if ($unreadCount > 0): ?>
-                            <span class="badge badge-error" style="margin-left: auto;"><?php echo $unreadCount; ?></span>
+                            <span class="admin-nav-badge"><?php echo $unreadCount; ?></span>
                         <?php endif; ?>
                     </a>
                 </div>
@@ -157,7 +160,7 @@ $unreadCount = $db->fetch("SELECT COUNT(*) as count FROM contact_messages WHERE 
                     </svg>
                     View Website
                 </a>
-                <a href="<?php echo ADMIN_URL; ?>/logout.php" class="admin-nav-link" style="color: var(--error);">
+                <a href="<?php echo ADMIN_URL; ?>/logout.php" class="admin-nav-link admin-nav-link--danger">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                         <polyline points="16 17 21 12 16 7"></polyline>

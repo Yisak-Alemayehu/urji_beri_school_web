@@ -82,7 +82,7 @@ include ADMIN_PATH . '/includes/admin_header.php';
 <div class="admin-card">
     <div class="admin-card-header">
         <h2 class="admin-card-title">Director's Message</h2>
-        <a href="<?php echo SITE_URL; ?>/director.php" class="btn btn-outline" target="_blank">
+        <a href="<?php echo route_url('director'); ?>" class="btn btn-outline" target="_blank">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>

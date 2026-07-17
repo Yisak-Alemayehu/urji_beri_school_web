@@ -41,37 +41,89 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $title = clean_input($_POST['title'] ?? '');
         $altText = clean_input($_POST['alt_text'] ?? '');
-        $description = clean_input($_POST['description'] ?? '');
         $categoryId = (int)($_POST['category_id'] ?? 0);
         $isActive = isset($_POST['is_active']) ? 1 : 0;
-        $isFeatured = isset($_POST['is_featured']) ? 1 : 0;
-        
+        $uploadedFiles = normalize_uploaded_files('images');
+        $maxUploads = 10;
+
         if (empty($categoryId)) {
             $errors[] = 'Category is required.';
         }
-        
-        // Handle image upload
-        if (empty($_FILES['image']['name'])) {
-            $errors[] = 'Please select an image to upload.';
-        } else {
-            $uploadResult = upload_file($_FILES['image'], 'gallery');
-            if (!$uploadResult['success']) {
-                $errors[] = $uploadResult['error'];
-            }
+
+        if (empty($uploadedFiles)) {
+            $errors[] = 'Please select at least one image to upload.';
+        } elseif (count($uploadedFiles) > $maxUploads) {
+            $errors[] = 'You can upload up to ' . $maxUploads . ' images at once.';
         }
-        
+
         if (empty($errors)) {
-            try {
-                $db->query("INSERT INTO gallery_images (category_id, uploaded_by, filename, original_name, caption, alt_text, is_active, created_at)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())", 
-                           [$categoryId, current_user()['id'], $uploadResult['filename'], $_FILES['image']['name'], $title, $altText, $isActive]);
-                set_flash('success', 'Image uploaded successfully.');
-                redirect(ADMIN_URL . '/gallery.php');
-            } catch (Exception $e) {
-                // Delete uploaded file if database insert fails
-                delete_file($uploadResult['filename'], 'gallery');
-                $errors[] = 'Failed to save image. Please try again.';
+            $successCount = 0;
+            $failedFiles = [];
+            $savedFiles = [];
+
+            foreach ($uploadedFiles as $index => $file) {
+                $uploadResult = upload_file($file, 'gallery');
+
+                if (!$uploadResult['success']) {
+                    $failedFiles[] = ($file['name'] ?? 'Image ' . ($index + 1)) . ': ' . $uploadResult['error'];
+                    continue;
+                }
+
+                $caption = $title;
+                if ($caption === '') {
+                    $caption = pathinfo($file['name'], PATHINFO_FILENAME);
+                }
+
+                $imageAlt = $altText;
+                if ($imageAlt === '') {
+                    $imageAlt = $caption;
+                }
+
+                try {
+                    $db->query(
+                        "INSERT INTO gallery_images (category_id, uploaded_by, filename, original_name, caption, alt_text, file_size, is_active, created_at)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                        [
+                            $categoryId,
+                            current_user()['id'],
+                            $uploadResult['filename'],
+                            $file['name'],
+                            $caption,
+                            $imageAlt,
+                            $uploadResult['size'] ?? $file['size'],
+                            $isActive
+                        ]
+                    );
+
+                    $savedFiles[] = $uploadResult['filename'];
+                    $successCount++;
+                } catch (Exception $e) {
+                    delete_file($uploadResult['filename'], 'gallery');
+                    $failedFiles[] = ($file['name'] ?? 'Image ' . ($index + 1)) . ': failed to save to database.';
+                }
             }
+
+            if ($successCount > 0) {
+                $message = $successCount === 1
+                    ? '1 image uploaded successfully.'
+                    : $successCount . ' images uploaded successfully.';
+
+                if (!empty($failedFiles)) {
+                    $message .= ' Some files could not be uploaded.';
+                    set_flash('warning', $message);
+                    $_SESSION['gallery_upload_errors'] = $failedFiles;
+                } else {
+                    set_flash('success', $message);
+                }
+
+                redirect(ADMIN_URL . '/gallery.php' . ($categoryId ? '?category=' . $categoryId : ''));
+            }
+
+            foreach ($savedFiles as $filename) {
+                delete_file($filename, 'gallery');
+            }
+
+            $errors = array_merge($errors, $failedFiles ?: ['Failed to upload images. Please try again.']);
         }
     }
 }
@@ -109,7 +161,7 @@ include ADMIN_PATH . '/includes/admin_header.php';
     <!-- Upload Form -->
     <div class="admin-card">
         <div class="admin-card-header">
-            <h2 class="admin-card-title">Upload Image</h2>
+            <h2 class="admin-card-title">Upload Images</h2>
         </div>
         <div class="admin-card-body">
             <?php if (!empty($errors)): ?>
@@ -121,8 +173,19 @@ include ADMIN_PATH . '/includes/admin_header.php';
                     </ul>
                 </div>
             <?php endif; ?>
+
+            <?php if (!empty($_SESSION['gallery_upload_errors'])): ?>
+                <div class="alert alert-warning">
+                    <ul style="margin: 0; padding-left: 1.5rem;">
+                        <?php foreach ($_SESSION['gallery_upload_errors'] as $uploadError): ?>
+                            <li><?php echo e($uploadError); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+                <?php unset($_SESSION['gallery_upload_errors']); ?>
+            <?php endif; ?>
             
-            <form method="POST" enctype="multipart/form-data" class="admin-form">
+            <form method="POST" enctype="multipart/form-data" class="admin-form" id="galleryUploadForm">
                 <?php echo csrf_field(); ?>
                 
                 <div class="form-group">
@@ -130,43 +193,41 @@ include ADMIN_PATH . '/includes/admin_header.php';
                     <select id="category_id" name="category_id" class="form-control" required>
                         <option value="">Select Category</option>
                         <?php foreach ($categories as $category): ?>
-                            <option value="<?php echo $category['id']; ?>"><?php echo e($category['name']); ?></option>
+                            <option value="<?php echo $category['id']; ?>" <?php echo $filter === (int)$category['id'] ? 'selected' : ''; ?>>
+                                <?php echo e($category['name']); ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label for="title">Caption/Title</label>
+                    <label for="title">Caption/Title <small class="text-muted">- Applied to all selected images (optional)</small></label>
                     <input type="text" id="title" name="title" class="form-control" 
-                           placeholder="Image caption (shows on hover)">
+                           placeholder="Shared caption for this batch">
                 </div>
                 
                 <div class="form-group">
-                    <label for="alt_text">Alt Text (SEO) <small class="text-muted">- Describes the image for search engines</small></label>
+                    <label for="alt_text">Alt Text (SEO) <small class="text-muted">- Applied to all selected images (optional)</small></label>
                     <input type="text" id="alt_text" name="alt_text" class="form-control" 
                            placeholder="e.g., Students learning in classroom at Urji Beri School">
                 </div>
                 
                 <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description" class="form-control" rows="2" 
-                              placeholder="Optional longer description"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Image <span class="required">*</span></label>
-                    <div class="file-upload-area">
-                        <input type="file" name="image" id="image" 
-                               accept="image/jpeg,image/png,image/gif,image/webp" class="file-input" required>
-                        <label for="image" class="file-label">
+                    <label>Images <span class="required">*</span></label>
+                    <div class="file-upload-area" data-max-files="10">
+                        <input type="file" name="images[]" id="galleryImages"
+                               accept="image/jpeg,image/png,image/gif,image/webp"
+                               class="file-input file-input-multiple" multiple required>
+                        <label for="galleryImages" class="file-label">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                 <polyline points="17 8 12 3 7 8"></polyline>
                                 <line x1="12" y1="3" x2="12" y2="15"></line>
                             </svg>
-                            <span>Click to upload</span>
-                            <small>JPEG, PNG, GIF, WebP (Max 5MB)</small>
+                            <span>Click to upload or drag and drop</span>
+                            <small>Select up to 10 images (JPEG, PNG, GIF, WebP · Max 5MB each)</small>
                         </label>
+                        <div class="file-preview-grid" hidden></div>
                     </div>
                 </div>
                 
@@ -178,13 +239,6 @@ include ADMIN_PATH . '/includes/admin_header.php';
                             Active
                         </label>
                     </div>
-                    <div class="form-group checkbox-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="is_featured" value="1">
-                            <span class="checkbox-custom"></span>
-                            Featured
-                        </label>
-                    </div>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-block">
@@ -193,7 +247,7 @@ include ADMIN_PATH . '/includes/admin_header.php';
                         <polyline points="17 8 12 3 7 8"></polyline>
                         <line x1="12" y1="3" x2="12" y2="15"></line>
                     </svg>
-                    Upload Image
+                    Upload Images
                 </button>
             </form>
         </div>
@@ -225,8 +279,8 @@ include ADMIN_PATH . '/includes/admin_header.php';
                         <div class="admin-gallery-item <?php echo !$image['is_active'] ? 'inactive' : ''; ?>">
                             <div class="admin-gallery-img">
                                 <img src="<?php echo upload_url($image['filename'], 'gallery'); ?>" 
-                                     alt="<?php echo e($image['title']); ?>">
-                                <?php if ($image['is_featured']): ?>
+                                     alt="<?php echo e($image['alt_text'] ?: $image['caption']); ?>">
+                                <?php if ($image['is_featured'] ?? false): ?>
                                     <span class="badge badge-warning" style="position: absolute; top: 0.5rem; left: 0.5rem;">Featured</span>
                                 <?php endif; ?>
                                 <?php if (!$image['is_active']): ?>
@@ -234,7 +288,7 @@ include ADMIN_PATH . '/includes/admin_header.php';
                                 <?php endif; ?>
                             </div>
                             <div class="admin-gallery-info">
-                                <strong><?php echo e($image['title'] ?: 'Untitled'); ?></strong>
+                                <strong><?php echo e($image['caption'] ?: 'Untitled'); ?></strong>
                                 <small><?php echo e($image['category_name']); ?></small>
                             </div>
                             <div class="admin-gallery-actions">
@@ -331,6 +385,44 @@ include ADMIN_PATH . '/includes/admin_header.php';
     padding: 0.75rem;
     border-top: 1px solid var(--gray-100);
     justify-content: center;
+}
+
+.file-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.file-preview-grid .file-preview-item {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+    background: var(--white);
+}
+
+.file-preview-grid .file-preview-item img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+}
+
+.file-preview-grid .file-preview-meta {
+    padding: 0.35rem 0.45rem;
+    font-size: 0.7rem;
+    color: var(--gray-600);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-upload-count {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary);
 }
 </style>
 

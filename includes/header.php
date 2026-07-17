@@ -6,7 +6,7 @@
  */
 
 // Get current page for active nav highlighting
-$currentPage = basename($_SERVER['PHP_SELF'], '.php');
+$currentPage = defined('CURRENT_PAGE') ? CURRENT_PAGE : basename($_SERVER['PHP_SELF'], '.php');
 
 // Default SEO settings (can be overridden by individual pages)
 $seoDefaults = [
@@ -105,20 +105,20 @@ $seo = isset($pageSeo) ? array_merge($seoDefaults, $pageSeo) : $seoDefaults;
     <header class="header" id="header">
         <div class="container">
             <div class="header-inner">
-                <a href="<?php echo SITE_URL; ?>" class="logo" title="<?php echo e(get_setting('site_name')); ?> - Home">
+                <a href="<?php echo route_url('home'); ?>" class="logo" title="<?php echo e(get_setting('site_name')); ?> - Home">
                     <img src="<?php echo asset_url('images/logo.png'); ?>" alt="<?php echo e(get_setting('site_name')); ?> Logo" width="50" height="50">
                     <span class="logo-text"><?php echo e(get_setting('site_name', 'Urji Beri School')); ?></span>
                 </a>
                 
                 <nav class="nav-menu" id="navMenu" role="navigation" aria-label="Main Navigation">
-                    <a href="<?php echo SITE_URL; ?>" class="nav-link <?php echo $currentPage === 'index' ? 'active' : ''; ?>" title="Home">Home</a>
-                    <a href="<?php echo SITE_URL; ?>/about.php" class="nav-link <?php echo $currentPage === 'about' ? 'active' : ''; ?>" title="About Urji Beri School">About Us</a>
-                    <a href="<?php echo SITE_URL; ?>/director.php" class="nav-link <?php echo $currentPage === 'director' ? 'active' : ''; ?>" title="Message from the Director">Director's Welcome</a>
-                    <a href="<?php echo SITE_URL; ?>/gallery.php" class="nav-link <?php echo $currentPage === 'gallery' ? 'active' : ''; ?>" title="Photo Gallery">Gallery</a>
-                    <a href="<?php echo SITE_URL; ?>/blog.php" class="nav-link <?php echo $currentPage === 'blog' ? 'active' : ''; ?>" title="Latest News & Events">News</a>
+                    <a href="<?php echo route_url('home'); ?>" class="nav-link <?php echo $currentPage === 'index' ? 'active' : ''; ?>" title="Home">Home</a>
+                    <a href="<?php echo route_url('about'); ?>" class="nav-link <?php echo $currentPage === 'about' ? 'active' : ''; ?>" title="About Urji Beri School">About Us</a>
+                    <a href="<?php echo route_url('director'); ?>" class="nav-link <?php echo $currentPage === 'director' ? 'active' : ''; ?>" title="Message from the Director">Director's Welcome</a>
+                    <a href="<?php echo route_url('gallery'); ?>" class="nav-link <?php echo $currentPage === 'gallery' ? 'active' : ''; ?>" title="Photo Gallery">Gallery</a>
+                    <a href="<?php echo route_url('blog'); ?>" class="nav-link <?php echo in_array($currentPage, ['blog', 'blog-detail'], true) ? 'active' : ''; ?>" title="Latest News & Events">News</a>
                     <a href="<?php echo e(get_setting('online_result_url', 'https://sms.urjiberischool.com/portal/login?')); ?>" class="nav-link nav-link-app" target="_blank" rel="noopener" title="Students & Parents App — results, attendance, fees">Students/Parents App</a>
                     <a href="<?php echo e(get_setting('teacher_login_url', 'https://sms.urjiberischool.com/teacher-portal/login?')); ?>" class="nav-link nav-link-app" target="_blank" rel="noopener" title="Teachers App — sign in to UBS Teacher">Teachers App</a>
-                    <a href="<?php echo SITE_URL; ?>/contact.php" class="nav-link <?php echo $currentPage === 'contact' ? 'active' : ''; ?>" title="Contact Us">Contact</a>
+                    <a href="<?php echo route_url('contact'); ?>" class="nav-link <?php echo $currentPage === 'contact' ? 'active' : ''; ?>" title="Contact Us">Contact</a>
                 </nav>
                 
                 <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle Navigation Menu" aria-expanded="false" aria-controls="navMenu">

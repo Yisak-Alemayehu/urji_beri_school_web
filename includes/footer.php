@@ -26,7 +26,7 @@
                         </a>
                         <?php endif; ?>
                         <?php if (get_setting('social_telegram')): ?>
-                        <a href="<?php echo e(get_setting('social_telegram')); ?>" target="_blank" rel="noopener noreferrer" aria-label="Join us on Telegram" title="Telegram">
+                        <a href="<?php echo e(get_setting('social_telegram')); ?>" target="_blank" rel="noopener noreferrer" aria-label="Follow our Telegram channel" title="Telegram Channel">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
                             </svg>
@@ -46,11 +46,11 @@
                     <h4 class="footer-title">Quick Links</h4>
                     <nav aria-label="Footer Navigation">
                         <ul class="footer-links">
-                            <li><a href="<?php echo SITE_URL; ?>">Home</a></li>
-                            <li><a href="<?php echo SITE_URL; ?>/about.php">About Us</a></li>
-                            <li><a href="<?php echo SITE_URL; ?>/gallery.php">Gallery</a></li>
-                            <li><a href="<?php echo SITE_URL; ?>/blog.php">News & Events</a></li>
-                            <li><a href="<?php echo SITE_URL; ?>/contact.php">Contact</a></li>
+                            <li><a href="<?php echo route_url('home'); ?>">Home</a></li>
+                            <li><a href="<?php echo route_url('about'); ?>">About Us</a></li>
+                            <li><a href="<?php echo route_url('gallery'); ?>">Gallery</a></li>
+                            <li><a href="<?php echo route_url('blog'); ?>">News & Events</a></li>
+                            <li><a href="<?php echo route_url('contact'); ?>">Contact</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -61,8 +61,8 @@
                         <ul class="footer-links">
                             <li><a href="<?php echo e(get_setting('online_result_url', 'https://sms.urjiberischool.com/portal/login?')); ?>" target="_blank" rel="noopener">Students/Parents App</a></li>
                             <li><a href="<?php echo e(get_setting('teacher_login_url', 'https://sms.urjiberischool.com/teacher-portal/login?')); ?>" target="_blank" rel="noopener">Teachers App</a></li>
-                            <li><a href="<?php echo SITE_URL; ?>/director.php">Director's Message</a></li>
-                            <li><a href="<?php echo SITE_URL; ?>/sitemap.php" rel="nofollow">Sitemap</a></li>
+                            <li><a href="<?php echo route_url('director'); ?>">Director's Message</a></li>
+                            <li><a href="<?php echo route_url('sitemap'); ?>" rel="nofollow">Sitemap</a></li>
                         </ul>
                     </nav>
                 </div>
@@ -107,16 +107,57 @@
     <?php endif; ?>
     
     <!-- Lightbox -->
-    <div class="lightbox" id="lightbox">
-        <div class="lightbox-close" id="lightboxClose">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer" aria-hidden="true">
+        <div class="lightbox-backdrop" data-lightbox-close></div>
+
+        <div class="lightbox-toolbar">
+            <span class="lightbox-counter" id="lightboxCounter" aria-live="polite"></span>
+            <div class="lightbox-toolbar-actions">
+                <button type="button" class="lightbox-btn" id="lightboxShare" aria-label="Share image" title="Share">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                </button>
+                <a href="#" class="lightbox-btn" id="lightboxDownload" download aria-label="Download image" title="Download">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </a>
+                <button type="button" class="lightbox-btn lightbox-close" id="lightboxClose" aria-label="Close" title="Close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Previous image" title="Previous">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
+        </button>
+        <button type="button" class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Next image" title="Next">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </button>
+
+        <div class="lightbox-stage">
+            <div class="lightbox-loader" id="lightboxLoader" aria-hidden="true"></div>
+            <div class="lightbox-content">
+                <img src="" alt="" class="lightbox-image" id="lightboxImage">
+            </div>
+            <p class="lightbox-caption" id="lightboxCaption"></p>
         </div>
-        <div class="lightbox-content">
-            <img src="" alt="" id="lightboxImage">
-        </div>
+
+        <div class="lightbox-toast" id="lightboxToast" role="status" aria-live="polite"></div>
     </div>
 
     <!-- Registration & Promo Popups (must load before main.js) -->

@@ -1,7 +1,7 @@
 # Apache Configuration for Urji Beri School Website
 
-# Enable URL Rewriting
 RewriteEngine On
+RewriteBase /
 
 # Redirect to HTTPS (uncomment in production)
 # RewriteCond %{HTTPS} off
@@ -11,13 +11,34 @@ RewriteEngine On
 RewriteRule ^config/ - [F,L]
 RewriteRule ^includes/ - [F,L]
 
-# Remove .php extension (optional - uncomment if desired)
-# RewriteCond %{REQUEST_FILENAME} !-d
-# RewriteCond %{REQUEST_FILENAME}\.php -f
-# RewriteRule ^(.*)$ $1.php [L]
+# Legacy query-string URLs → clean URLs
+RewriteCond %{THE_REQUEST} \s/blog-detail\.php\?slug=([^\s&]+) [NC]
+RewriteRule ^blog-detail\.php$ /blog/%1? [R=301,L]
+
+RewriteCond %{THE_REQUEST} \s/gallery\.php\?category=([^\s&]+) [NC]
+RewriteRule ^gallery\.php$ /gallery/%1? [R=301,L]
+
+RewriteCond %{THE_REQUEST} \s/blog\.php\?category=([^\s&]+) [NC]
+RewriteRule ^blog\.php$ /blog/category/%1? [R=301,L]
+
+# Redirect public .php URLs to clean URLs (keep admin untouched)
+RewriteCond %{THE_REQUEST} \s/+([^/\s?]+)\.php[\s?] [NC]
+RewriteCond %{REQUEST_URI} !^/admin/ [NC]
+RewriteRule ^([^/]+)\.php$ /%1 [R=301,L,QSA]
+
+# Redirect index.php to home
+RewriteRule ^index\.php$ / [R=301,L]
+
+# Allow existing files and directories (assets, uploads, admin, etc.)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
 
 # Sitemap alias
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+# Front controller — clean URLs
+RewriteRule ^ router.php [L,QSA]
 
 # Custom error pages
 ErrorDocument 404 /404.php
@@ -64,6 +85,3 @@ AddDefaultCharset UTF-8
     Header set X-XSS-Protection "1; mode=block"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
-
-# Custom error pages (uncomment and create these files if needed)
-# ErrorDocument 500 /500.php

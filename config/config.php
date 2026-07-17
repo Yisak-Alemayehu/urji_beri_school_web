@@ -29,7 +29,7 @@ define('SESSION_LIFETIME', 3600); // 1 hour
 
 // Pagination
 define('POSTS_PER_PAGE', 9);
-define('GALLERY_PER_PAGE', 12);
+define('GALLERY_PER_PAGE', 15);
 define('MESSAGES_PER_PAGE', 20);
 
 // Security
@@ -50,6 +50,9 @@ require_once INCLUDES_PATH . '/functions.php';
 
 // Include authentication helpers
 require_once INCLUDES_PATH . '/auth.php';
+
+// Include router
+require_once INCLUDES_PATH . '/router.php';
 
 // Start session with secure settings
 if (session_status() === PHP_SESSION_NONE) {

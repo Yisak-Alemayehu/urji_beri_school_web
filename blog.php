@@ -60,9 +60,9 @@ $pageSeo = [
 ];
 
 // Breadcrumb Schema
-$breadcrumbs = ['Home' => SITE_URL, 'News & Events' => SITE_URL . '/blog.php'];
+$breadcrumbs = ['Home' => route_url('home'), 'News & Events' => route_url('blog')];
 if ($currentCategory) {
-    $breadcrumbs[$currentCategory['name']] = SITE_URL . '/blog.php?category=' . $currentCategory['slug'];
+    $breadcrumbs[$currentCategory['name']] = route_url('blog', ['category' => $currentCategory['slug']]);
 }
 $breadcrumbSchema = generate_breadcrumb_schema($breadcrumbs);
 
@@ -86,9 +86,13 @@ if ($search) {
 $totalCount = $db->fetch($countSql, $params)['total'];
 
 // Calculate pagination
-$baseUrl = SITE_URL . '/blog.php';
-if ($categorySlug) $baseUrl .= '?category=' . $categorySlug;
-elseif ($search) $baseUrl .= '?search=' . urlencode($search);
+if ($categorySlug) {
+    $baseUrl = route_url('blog', ['category' => $categorySlug]);
+} elseif ($search) {
+    $baseUrl = url('blog', ['search' => $search]);
+} else {
+    $baseUrl = route_url('blog');
+}
 
 $pagination = paginate($totalCount, $currentPageNum, POSTS_PER_PAGE, $baseUrl);
 
@@ -130,7 +134,7 @@ include INCLUDES_PATH . '/header.php';
             <div class="page-header-content">
                 <h1 class="page-title">News & Events</h1>
                 <nav class="breadcrumb">
-                    <a href="<?php echo SITE_URL; ?>">Home</a>
+                    <a href="<?php echo route_url('home'); ?>">Home</a>
                     <span class="breadcrumb-separator">/</span>
                     <span>News</span>
                 </nav>
@@ -144,16 +148,16 @@ include INCLUDES_PATH . '/header.php';
             <!-- Search and Filter -->
             <div class="d-flex justify-between align-center gap-4 mb-8" style="flex-wrap: wrap;">
                 <!-- Search Form -->
-                <form action="<?php echo SITE_URL; ?>/blog.php" method="GET" class="d-flex gap-4" style="flex: 1; max-width: 400px;">
+                <form action="<?php echo route_url('blog'); ?>" method="GET" class="d-flex gap-4" style="flex: 1; max-width: 400px;">
                     <input type="text" name="search" class="form-control" placeholder="Search articles..." value="<?php echo e($search); ?>">
                     <button type="submit" class="btn btn-primary">Search</button>
                 </form>
                 
                 <!-- Category Filter -->
                 <div class="gallery-filter" style="margin-bottom: 0;">
-                    <a href="<?php echo SITE_URL; ?>/blog.php" class="filter-btn <?php echo !$categorySlug && !$search ? 'active' : ''; ?>">All</a>
+                    <a href="<?php echo route_url('blog'); ?>" class="filter-btn <?php echo !$categorySlug && !$search ? 'active' : ''; ?>">All</a>
                     <?php foreach ($categories as $category): ?>
-                        <a href="<?php echo SITE_URL; ?>/blog.php?category=<?php echo e($category['slug']); ?>" 
+                        <a href="<?php echo route_url('blog', ['category' => $category['slug']]); ?>" 
                            class="filter-btn <?php echo $categorySlug === $category['slug'] ? 'active' : ''; ?>">
                             <?php echo e($category['name']); ?>
                         </a>
@@ -165,7 +169,7 @@ include INCLUDES_PATH . '/header.php';
                 <div class="mb-6">
                     <p class="text-muted">
                         Search results for "<?php echo e($search); ?>" 
-                        <a href="<?php echo SITE_URL; ?>/blog.php" style="margin-left: var(--spacing-2);">Clear search</a>
+                        <a href="<?php echo route_url('blog'); ?>" style="margin-left: var(--spacing-2);">Clear search</a>
                     </p>
                 </div>
             <?php endif; ?>
@@ -189,10 +193,10 @@ include INCLUDES_PATH . '/header.php';
                                     <span>By <?php echo e($post['author_name']); ?></span>
                                 </div>
                                 <h3 class="blog-card-title">
-                                    <a href="<?php echo SITE_URL; ?>/blog-detail.php?slug=<?php echo e($post['slug']); ?>"><?php echo e($post['title']); ?></a>
+                                    <a href="<?php echo route_url('blog-detail', ['slug' => $post['slug']]); ?>"><?php echo e($post['title']); ?></a>
                                 </h3>
                                 <p class="blog-card-excerpt"><?php echo e(truncate($post['excerpt'] ?: strip_tags($post['content']))); ?></p>
-                                <a href="<?php echo SITE_URL; ?>/blog-detail.php?slug=<?php echo e($post['slug']); ?>" class="blog-card-link">
+                                <a href="<?php echo route_url('blog-detail', ['slug' => $post['slug']]); ?>" class="blog-card-link">
                                     Read More
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <line x1="5" y1="12" x2="19" y2="12"></line>

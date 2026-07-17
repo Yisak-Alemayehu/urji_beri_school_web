@@ -112,6 +112,11 @@ function initFileUpload() {
         const label = wrapper?.querySelector('.file-label');
         
         if (!label) return;
+
+        if (input.classList.contains('file-input-multiple')) {
+            initMultipleFileUpload(input, wrapper, label);
+            return;
+        }
         
         // Drag and drop
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -152,18 +157,7 @@ function initFileUpload() {
         const label = wrapper?.querySelector('.file-label');
         
         // Validate file type
-        const allowedTypes = input.accept.split(',').map(t => t.trim());
-        const fileType = file.type;
-        
-        if (!allowedTypes.some(type => fileType.match(type.replace('*', '.*')))) {
-            alert('Invalid file type. Please select a valid image file.');
-            input.value = '';
-            return;
-        }
-        
-        // Validate file size (5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            alert('File size exceeds 5MB limit.');
+        if (!validateImageFile(input, file)) {
             input.value = '';
             return;
         }
@@ -206,6 +200,126 @@ function initFileUpload() {
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function initMultipleFileUpload(input, wrapper, label) {
+        const maxFiles = parseInt(wrapper.dataset.maxFiles || '10', 10);
+        const previewGrid = wrapper.querySelector('.file-preview-grid');
+        let countLabel = wrapper.querySelector('.file-upload-count');
+
+        if (!countLabel) {
+            countLabel = document.createElement('div');
+            countLabel.className = 'file-upload-count';
+            wrapper.appendChild(countLabel);
+        }
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            wrapper.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            wrapper.addEventListener(eventName, () => wrapper.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            wrapper.addEventListener(eventName, () => wrapper.classList.remove('dragover'), false);
+        });
+
+        wrapper.addEventListener('drop', function(e) {
+            const files = Array.from(e.dataTransfer.files || []);
+            if (!files.length) return;
+            setMultipleFiles(input, files.slice(0, maxFiles));
+        });
+
+        input.addEventListener('change', function() {
+            if (!this.files.length) return;
+            setMultipleFiles(this, Array.from(this.files).slice(0, maxFiles));
+        });
+
+        function setMultipleFiles(fileInput, files) {
+            const validFiles = files.filter(file => validateImageFile(fileInput, file, false));
+            if (!validFiles.length) {
+                fileInput.value = '';
+                renderMultiplePreview(fileInput, previewGrid, label, countLabel, []);
+                return;
+            }
+
+            if (validFiles.length > maxFiles) {
+                alert(`You can upload up to ${maxFiles} images at once.`);
+            }
+
+            const dt = new DataTransfer();
+            validFiles.slice(0, maxFiles).forEach(file => dt.items.add(file));
+            fileInput.files = dt.files;
+            renderMultiplePreview(fileInput, previewGrid, label, countLabel, validFiles.slice(0, maxFiles));
+        }
+
+        function renderMultiplePreview(fileInput, grid, fileLabel, counter, files) {
+            if (!grid) return;
+
+            grid.innerHTML = '';
+
+            if (!files.length) {
+                grid.hidden = true;
+                fileLabel.style.display = '';
+                counter.textContent = '';
+                return;
+            }
+
+            grid.hidden = false;
+            fileLabel.style.display = 'none';
+            counter.textContent = `${files.length} image${files.length === 1 ? '' : 's'} selected`;
+
+            files.forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'file-preview-item';
+                item.innerHTML = `
+                    <img src="" alt="">
+                    <div class="file-preview-meta">${file.name}</div>
+                `;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    item.querySelector('img').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+                grid.appendChild(item);
+            });
+
+            const clearBtn = document.createElement('button');
+            clearBtn.type = 'button';
+            clearBtn.className = 'btn btn-outline btn-sm';
+            clearBtn.style.marginTop = '0.75rem';
+            clearBtn.textContent = 'Clear selection';
+            clearBtn.addEventListener('click', () => {
+                fileInput.value = '';
+                renderMultiplePreview(fileInput, grid, fileLabel, counter, []);
+            });
+            grid.appendChild(clearBtn);
+        }
+    }
+
+    function validateImageFile(input, file, showAlert = true) {
+        const allowedTypes = input.accept.split(',').map(t => t.trim());
+        const fileType = file.type;
+
+        if (!allowedTypes.some(type => fileType.match(type.replace('*', '.*')))) {
+            if (showAlert) alert('Invalid file type. Please select a valid image file.');
+            return false;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            if (showAlert) alert(`${file.name} exceeds the 5MB limit.`);
+            return false;
+        }
+
+        return true;
     }
 }
 
@@ -296,20 +410,7 @@ function initConfirmDialogs() {
  * Data Tables Enhancement
  */
 function initDataTables() {
-    const tables = document.querySelectorAll('.admin-table');
-    
-    tables.forEach(table => {
-        // Add hover effect
-        const rows = table.querySelectorAll('tbody tr');
-        rows.forEach(row => {
-            row.addEventListener('mouseenter', function() {
-                this.style.backgroundColor = 'rgba(54, 121, 255, 0.05)';
-            });
-            row.addEventListener('mouseleave', function() {
-                this.style.backgroundColor = '';
-            });
-        });
-    });
+    // Table hover handled via CSS (.admin-table tbody tr:hover td)
 }
 
 /**

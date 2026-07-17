@@ -31,35 +31,35 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     
     <!-- Static Pages -->
     <url>
-        <loc><?php echo SITE_URL; ?>/about.php</loc>
+        <loc><?php echo route_url('about'); ?></loc>
         <lastmod><?php echo date('Y-m-d'); ?></lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>
     </url>
     
     <url>
-        <loc><?php echo SITE_URL; ?>/director.php</loc>
+        <loc><?php echo route_url('director'); ?></loc>
         <lastmod><?php echo date('Y-m-d'); ?></lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     
     <url>
-        <loc><?php echo SITE_URL; ?>/contact.php</loc>
+        <loc><?php echo route_url('contact'); ?></loc>
         <lastmod><?php echo date('Y-m-d'); ?></lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     
     <url>
-        <loc><?php echo SITE_URL; ?>/gallery.php</loc>
+        <loc><?php echo route_url('gallery'); ?></loc>
         <lastmod><?php echo date('Y-m-d'); ?></lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
     
     <url>
-        <loc><?php echo SITE_URL; ?>/blog.php</loc>
+        <loc><?php echo route_url('blog'); ?></loc>
         <lastmod><?php echo date('Y-m-d'); ?></lastmod>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
@@ -73,7 +73,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     foreach ($blogCategories as $category):
     ?>
     <url>
-        <loc><?php echo SITE_URL; ?>/blog.php?category=<?php echo e($category['slug']); ?></loc>
+        <loc><?php echo route_url('blog', ['category' => $category['slug']]); ?></loc>
         <lastmod><?php echo date('Y-m-d', strtotime($category['updated_at'])); ?></lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
@@ -92,7 +92,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     foreach ($blogPosts as $post):
     ?>
     <url>
-        <loc><?php echo SITE_URL; ?>/blog-detail.php?slug=<?php echo e($post['slug']); ?></loc>
+        <loc><?php echo route_url('blog-detail', ['slug' => $post['slug']]); ?></loc>
         <lastmod><?php echo date('Y-m-d', strtotime($post['updated_at'])); ?></lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
@@ -124,7 +124,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     foreach ($galleryCategories as $category):
     ?>
     <url>
-        <loc><?php echo SITE_URL; ?>/gallery.php?category=<?php echo e($category['slug']); ?></loc>
+        <loc><?php echo route_url('gallery', ['category' => $category['slug']]); ?></loc>
         <lastmod><?php echo date('Y-m-d', strtotime($category['updated_at'])); ?></lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
@@ -158,7 +158,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     foreach ($imagesByCategory as $catSlug => $catData):
     ?>
     <url>
-        <loc><?php echo SITE_URL; ?>/gallery.php?category=<?php echo e($catSlug); ?></loc>
+        <loc><?php echo route_url('gallery', ['category' => $catSlug]); ?></loc>
         <?php foreach (array_slice($catData['images'], 0, 50) as $image): ?>
         <image:image>
             <image:loc><?php echo SITE_URL; ?>/uploads/gallery/<?php echo e($image['filename']); ?></image:loc>

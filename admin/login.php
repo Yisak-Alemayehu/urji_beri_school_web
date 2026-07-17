@@ -50,32 +50,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>">
     <link rel="stylesheet" href="<?php echo asset_url('css/admin.css'); ?>">
 </head>
-<body>
+<body class="admin-app">
     <div class="login-page">
         <div class="login-container">
-            <aside class="login-brand-panel" aria-label="Admin dashboard highlights">
-                <p class="login-brand-kicker">Urji Beri Admin</p>
-                <h2>One calm place to keep the school story current.</h2>
-                <div class="login-brand-grid">
-                    <span>News</span>
-                    <span>Gallery</span>
-                    <span>Messages</span>
-                    <span>Settings</span>
-                </div>
-                <p class="login-brand-note">Built for staff who need fast updates, clean publishing, and parent-facing content that always feels polished.</p>
-            </aside>
-
             <div class="login-card">
                 <div class="login-header">
                     <img src="<?php echo asset_url('images/logo.png'); ?>" alt="<?php echo e(get_setting('site_name')); ?>" class="login-logo">
-                    <h1 class="login-title">School Command Center</h1>
-                    <p class="login-subtitle">Sign in to manage stories, gallery moments, messages, and school settings.</p>
+                    <h1 class="login-title">Admin Sign In</h1>
+                    <p class="login-subtitle">Enter your credentials to manage <?php echo e(get_setting('site_name')); ?>.</p>
                 </div>
                 
                 <?php if ($error): ?>
@@ -98,18 +86,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="password" id="password" name="password" class="form-control" required>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary">
-                        Sign In
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: var(--spacing-2);">
-                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                            <polyline points="10 17 15 12 10 7"></polyline>
-                            <line x1="15" y1="12" x2="3" y2="12"></line>
-                        </svg>
-                    </button>
+                    <button type="submit" class="btn btn-primary">Sign In</button>
                 </form>
                 
                 <div class="login-footer">
-                    <a href="<?php echo SITE_URL; ?>">← Back to Website</a>
+                    <a href="<?php echo SITE_URL; ?>">← Back to website</a>
                 </div>
             </div>
         </div>

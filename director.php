@@ -22,7 +22,7 @@ $pageSeo = [
 // Breadcrumb Schema
 $breadcrumbSchema = generate_breadcrumb_schema([
     'Home' => SITE_URL,
-    "Director's Welcome" => SITE_URL . '/director.php'
+    "Director's Welcome" => route_url('director')
 ]);
 
 include INCLUDES_PATH . '/header.php';
@@ -104,8 +104,8 @@ include INCLUDES_PATH . '/header.php';
                 <h2 class="cta-title">Want to Learn More?</h2>
                 <p class="cta-text">Schedule a visit to our campus and meet our dedicated team of educators.</p>
                 <div class="btn-group justify-center">
-                    <a href="<?php echo SITE_URL; ?>/contact.php" class="btn btn-primary btn-lg">Schedule a Visit</a>
-                    <a href="<?php echo SITE_URL; ?>/about.php" class="btn btn-outline btn-lg">About Our School</a>
+                    <a href="<?php echo route_url('contact'); ?>" class="btn btn-primary btn-lg">Schedule a Visit</a>
+                    <a href="<?php echo route_url('about'); ?>" class="btn btn-outline btn-lg">About Our School</a>
                 </div>
             </div>
         </div>

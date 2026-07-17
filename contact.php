@@ -21,7 +21,7 @@ $pageSeo = [
 // Breadcrumb Schema
 $breadcrumbSchema = generate_breadcrumb_schema([
     'Home' => SITE_URL,
-    'Contact Us' => SITE_URL . '/contact.php'
+    'Contact Us' => route_url('contact')
 ]);
 $contactPageSchema = generate_contact_page_schema();
 
@@ -245,7 +245,20 @@ include INCLUDES_PATH . '/header.php';
                             </div>
                             <div class="contact-details">
                                 <h4>Follow Us</h4>
-                                <p><a href="<?php echo e(get_setting('facebook_url')); ?>" target="_blank">Urji Beri Primary School</a></p>
+                                <div class="contact-social-links">
+                                    <?php if (get_setting('social_facebook')): ?>
+                                        <a href="<?php echo e(get_setting('social_facebook')); ?>" target="_blank" rel="noopener noreferrer">Facebook</a>
+                                    <?php endif; ?>
+                                    <?php if (get_setting('social_telegram')): ?>
+                                        <a href="<?php echo e(get_setting('social_telegram')); ?>" target="_blank" rel="noopener noreferrer">Telegram Channel</a>
+                                    <?php endif; ?>
+                                    <?php if (get_setting('social_instagram')): ?>
+                                        <a href="<?php echo e(get_setting('social_instagram')); ?>" target="_blank" rel="noopener noreferrer">Instagram</a>
+                                    <?php endif; ?>
+                                    <?php if (get_setting('social_youtube')): ?>
+                                        <a href="<?php echo e(get_setting('social_youtube')); ?>" target="_blank" rel="noopener noreferrer">YouTube</a>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -38,6 +38,7 @@ $settingGroups = [
             'social_twitter' => ['label' => 'Twitter/X URL', 'type' => 'url'],
             'social_instagram' => ['label' => 'Instagram URL', 'type' => 'url'],
             'social_youtube' => ['label' => 'YouTube URL', 'type' => 'url'],
+            'social_telegram' => ['label' => 'Telegram Channel URL', 'type' => 'url', 'placeholder' => 'https://t.me/yourchannel'],
             'social_linkedin' => ['label' => 'LinkedIn URL', 'type' => 'url'],
         ]
     ],
@@ -170,7 +171,7 @@ include ADMIN_PATH . '/includes/admin_header.php';
     <div class="admin-card-header">
         <h2 class="admin-card-title">Site Settings</h2>
     </div>
-    <div class="admin-card-body" style="padding: 0;">
+    <div class="admin-card-body admin-card-body--flush">
         <div class="settings-layout">
             <!-- Tabs -->
             <div class="settings-tabs">
@@ -250,99 +251,5 @@ include ADMIN_PATH . '/includes/admin_header.php';
         </div>
     </div>
 </div>
-
-<style>
-.settings-layout {
-    display: flex;
-    min-height: 500px;
-}
-
-.settings-tabs {
-    width: 220px;
-    background: var(--gray-50);
-    border-right: 1px solid var(--gray-200);
-    padding: 1rem 0;
-    flex-shrink: 0;
-}
-
-.settings-tab {
-    display: block;
-    padding: 0.875rem 1.5rem;
-    color: var(--gray-600);
-    text-decoration: none;
-    border-left: 3px solid transparent;
-    transition: var(--transition);
-}
-
-.settings-tab:hover {
-    background: var(--white);
-    color: var(--primary);
-}
-
-.settings-tab.active {
-    background: var(--white);
-    color: var(--primary);
-    border-left-color: var(--primary);
-    font-weight: 600;
-}
-
-.settings-content {
-    flex: 1;
-    padding: 2rem;
-}
-
-.settings-section-title {
-    font-size: 1.25rem;
-    color: var(--gray-800);
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--gray-200);
-}
-
-@media (max-width: 768px) {
-    .settings-layout {
-        flex-direction: column;
-    }
-    
-    .settings-tabs {
-        width: 100%;
-        display: flex;
-        overflow-x: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--gray-200);
-        padding: 0;
-    }
-    
-    .settings-tab {
-        white-space: nowrap;
-        border-left: none;
-        border-bottom: 3px solid transparent;
-    }
-    
-    .settings-tab.active {
-        border-left-color: transparent;
-        border-bottom-color: var(--primary);
-    }
-    
-    .settings-content {
-        padding: 1.5rem;
-    }
-}
-
-.settings-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.65rem;
-    font-weight: 600;
-    color: var(--gray-700);
-    cursor: pointer;
-}
-
-.settings-toggle input {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--primary);
-}
-</style>
 
 <?php include ADMIN_PATH . '/includes/admin_footer.php'; ?>

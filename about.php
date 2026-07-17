@@ -20,7 +20,7 @@ $pageSeo = [
 // Breadcrumb Schema
 $breadcrumbSchema = generate_breadcrumb_schema([
     'Home' => SITE_URL,
-    'About Us' => SITE_URL . '/about.php'
+    'About Us' => route_url('about')
 ]);
 
 // Get values array from settings
@@ -199,7 +199,7 @@ include INCLUDES_PATH . '/header.php';
             <div class="cta-content">
                 <h2 class="cta-title">Ready to Join Our Community?</h2>
                 <p class="cta-text">Contact us today to learn more about enrollment opportunities at Urji Beri School.</p>
-                <a href="<?php echo SITE_URL; ?>/contact.php" class="btn btn-primary btn-lg">Get in Touch</a>
+                <a href="<?php echo route_url('contact'); ?>" class="btn btn-primary btn-lg">Get in Touch</a>
             </div>
         </div>
     </section>
