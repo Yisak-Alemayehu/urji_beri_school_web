@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1E3A8A">
     <title>Offline - Urji Beri School</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,650;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,67 +16,26 @@
         }
         
         body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #F8FAFC;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            color: #111827;
         }
         
         .offline-container {
             text-align: center;
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            max-width: 400px;
+            background: rgba(255, 255, 255, 0.88);
+            padding: 44px 36px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 24px 60px rgba(17, 24, 39, 0.1);
+            max-width: 420px;
             width: 100%;
-        }
-        
-        .offline-icon {
-            width: 80px;
-            height: 80px;
-            background: #f0f4ff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-        }
-        
-        .offline-icon svg {
-            width: 40px;
-            height: 40px;
-            color: #3679ff;
-        }
-        
-        h1 {
-            color: #1e293b;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        
-        p {
-            color: #64748b;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        
-        .retry-btn {
-            display: inline-block;
-            background: #3679ff;
-            color: white;
-            padding: 12px 30px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background 0.3s ease;
-        }
-        
-        .retry-btn:hover {
-            background: #2861d9;
+            backdrop-filter: blur(16px);
         }
         
         .logo {
@@ -83,6 +46,54 @@
             height: 60px;
             width: auto;
         }
+        
+        .offline-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(30, 58, 138, 0.08);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        
+        .offline-icon svg {
+            width: 40px;
+            height: 40px;
+            color: #1E3A8A;
+        }
+        
+        h1 {
+            font-family: 'Fraunces', Georgia, serif;
+            color: #111827;
+            font-size: 1.75rem;
+            margin-bottom: 10px;
+            letter-spacing: -0.03em;
+        }
+        
+        p {
+            color: #64748B;
+            margin-bottom: 28px;
+            line-height: 1.65;
+        }
+        
+        .retry-btn {
+            display: inline-block;
+            background: #1E3A8A;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 18px;
+            text-decoration: none;
+            font-weight: 650;
+            box-shadow: 0 14px 32px rgba(30, 58, 138, 0.28);
+            transition: background 0.25s ease, transform 0.25s ease;
+        }
+        
+        .retry-btn:hover {
+            background: #2563EB;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -92,7 +103,7 @@
         </div>
         
         <div class="offline-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <line x1="1" y1="1" x2="23" y2="23"></line>
                 <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
                 <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>

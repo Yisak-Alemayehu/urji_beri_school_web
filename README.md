@@ -34,7 +34,7 @@ A fully dynamic, database-driven website for **Urji Beri School** - an Ethiopian
 - **Backend:** PHP 7.4+ (vanilla, no frameworks)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
 - **Frontend:** HTML5, CSS3, JavaScript (ES6+)
-- **Design:** Glassmorphism UI with `#3679ff` primary color
+- **Design:** Light futuristic UI with teal/cyan accents and purposeful motion
 - **Maps:** OpenStreetMap (Leaflet.js ready)
 
 ## 📋 Requirements
@@ -161,7 +161,7 @@ urji_beri_school_website/
 ## 🎨 Design System
 
 ### Colors
-- **Primary:** `#3679ff` (Blue)
+- **Primary:** `#0f766e` (Deep teal)
 - **White:** `#ffffff`
 - **Gray shades:** `#f8f9fa`, `#e9ecef`, `#6c757d`, `#212529`
 - **Success:** `#28a745`

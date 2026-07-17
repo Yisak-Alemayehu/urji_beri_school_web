@@ -1,3 +1,5 @@
+    </main>
+
     <!-- Footer -->
     <footer class="footer" itemscope itemtype="https://schema.org/WPFooter">
         <div class="container">
@@ -57,8 +59,8 @@
                     <h4 class="footer-title">Resources</h4>
                     <nav aria-label="Resources Navigation">
                         <ul class="footer-links">
-                            <li><a href="<?php echo e(get_setting('online_result_url', 'https://result.urjiberischool.com/view_score.php')); ?>" target="_blank" rel="noopener">Online Results</a></li>
-                            <li><a href="<?php echo e(get_setting('teacher_login_url', 'https://result.urjiberischool.com/login.php')); ?>" target="_blank" rel="noopener">Teachers Portal</a></li>
+                            <li><a href="<?php echo e(get_setting('online_result_url', 'https://sms.urjiberischool.com/portal/login?')); ?>" target="_blank" rel="noopener">Students/Parents App</a></li>
+                            <li><a href="<?php echo e(get_setting('teacher_login_url', 'https://sms.urjiberischool.com/teacher-portal/login?')); ?>" target="_blank" rel="noopener">Teachers App</a></li>
                             <li><a href="<?php echo SITE_URL; ?>/director.php">Director's Message</a></li>
                             <li><a href="<?php echo SITE_URL; ?>/sitemap.php" rel="nofollow">Sitemap</a></li>
                         </ul>
@@ -114,6 +116,63 @@
         </div>
         <div class="lightbox-content">
             <img src="" alt="" id="lightboxImage">
+        </div>
+    </div>
+
+    <!-- Registration & Promo Popups (must load before main.js) -->
+    <div class="site-popup" id="registrationPopup" data-popup="registration" data-enabled="<?php echo setting_is_enabled('popup_registration_enabled', true) ? '1' : '0'; ?>" aria-hidden="true">
+        <div class="site-popup-backdrop" data-popup-close></div>
+        <div class="site-popup-dialog glass-card-solid" role="dialog" aria-modal="true" aria-labelledby="registrationPopupTitle">
+            <button type="button" class="site-popup-close" data-popup-close aria-label="Close registration announcement">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <span class="site-popup-badge">Admissions Open</span>
+            <h2 id="registrationPopupTitle"><?php echo e(get_setting('popup_registration_title', '2025/26 Registration Has Started!')); ?></h2>
+            <p><?php echo nl2br(e(get_setting('popup_registration_text', 'We have started registration for the new academic year. Families are welcome to visit our campus, ask questions, and register their children for preschool and elementary programs.'))); ?></p>
+            <ul class="site-popup-points">
+                <li>Preschool &amp; Elementary (Ages 3–13)</li>
+                <li>Bilingual Amharic &amp; English programs</li>
+                <li>Limited spaces — register early</li>
+            </ul>
+            <div class="site-popup-actions">
+                <a href="<?php echo e(site_url_for(get_setting('popup_registration_cta_link', '/contact.php'))); ?>" class="btn btn-primary btn-lg">
+                    <?php echo e(get_setting('popup_registration_cta_text', 'Register Your Child')); ?>
+                </a>
+                <button type="button" class="btn btn-outline" data-popup-close>Maybe Later</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="site-popup" id="promoPopup" data-popup="promo" data-enabled="<?php echo setting_is_enabled('popup_promo_enabled', true) ? '1' : '0'; ?>" aria-hidden="true">
+        <div class="site-popup-backdrop" data-popup-close></div>
+        <div class="site-popup-dialog site-popup-dialog-promo glass-card-solid" role="dialog" aria-modal="true" aria-labelledby="promoPopupTitle">
+            <button type="button" class="site-popup-close" data-popup-close aria-label="Close promotion">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="site-popup-promo-grid">
+                <div class="site-popup-promo-copy">
+                    <span class="site-popup-badge site-popup-badge-gold">Discover Urji Beri</span>
+                    <h2 id="promoPopupTitle"><?php echo e(get_setting('popup_promo_title', 'A School Families Trust')); ?></h2>
+                    <p><?php echo nl2br(e(get_setting('popup_promo_text', 'Experienced teachers, comfortable classrooms, and a caring community for children ages 3 to 13. Come see why parents choose Urji Beri School.'))); ?></p>
+                    <div class="site-popup-actions">
+                        <a href="<?php echo e(site_url_for(get_setting('popup_promo_cta_link', '/about.php'))); ?>" class="btn btn-primary">
+                            <?php echo e(get_setting('popup_promo_cta_text', 'Explore Our School')); ?>
+                        </a>
+                        <button type="button" class="btn btn-outline" data-popup-close>Close</button>
+                    </div>
+                </div>
+                <div class="site-popup-promo-visual" aria-hidden="true">
+                    <div class="site-popup-stat"><strong>550+</strong><span>Happy Students</span></div>
+                    <div class="site-popup-stat"><strong>18+</strong><span>Years of Excellence</span></div>
+                    <div class="site-popup-stat"><strong>98%</strong><span>Parent Satisfaction</span></div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -245,5 +304,10 @@
     <?php if (isset($extraJs)): ?>
         <?php echo $extraJs; ?>
     <?php endif; ?>
+    <script>
+        if (typeof initSitePopups === 'function') {
+            initSitePopups();
+        }
+    </script>
 </body>
 </html>

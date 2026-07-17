@@ -17,7 +17,8 @@ $settingGroups = [
         'settings' => [
             'site_name' => ['label' => 'School Name', 'type' => 'text', 'required' => true],
             'site_tagline' => ['label' => 'Tagline', 'type' => 'text'],
-            'site_description' => ['label' => 'Description', 'type' => 'textarea'],
+            'site_description' => ['label' => 'Meta Description (SEO)', 'type' => 'textarea'],
+            'site_keywords' => ['label' => 'Meta Keywords (SEO)', 'type' => 'textarea'],
             'school_established' => ['label' => 'Year Established', 'type' => 'text'],
         ]
     ],
@@ -51,8 +52,32 @@ $settingGroups = [
     'map' => [
         'title' => 'Location Map',
         'settings' => [
-            'map_latitude' => ['label' => 'Latitude', 'type' => 'text', 'placeholder' => 'e.g. 8.9467'],
-            'map_longitude' => ['label' => 'Longitude', 'type' => 'text', 'placeholder' => 'e.g. 38.7214'],
+            'map_latitude' => ['label' => 'Latitude', 'type' => 'text', 'placeholder' => 'e.g. 8.9806'],
+            'map_longitude' => ['label' => 'Longitude', 'type' => 'text', 'placeholder' => 'e.g. 38.7578'],
+            'map_zoom' => ['label' => 'Google Maps Zoom (1–20)', 'type' => 'number', 'min' => 1, 'max' => 20, 'placeholder' => '15'],
+        ]
+    ],
+    'seo' => [
+        'title' => 'SEO & Analytics',
+        'settings' => [
+            'google_analytics_id' => ['label' => 'Google Analytics ID (G-XXXXXXXX)', 'type' => 'text', 'placeholder' => 'G-XXXXXXXXXX'],
+            'google_site_verification' => ['label' => 'Google Search Console Verification', 'type' => 'text', 'placeholder' => 'meta content value'],
+            'bing_site_verification' => ['label' => 'Bing Webmaster Verification', 'type' => 'text', 'placeholder' => 'meta content value'],
+        ]
+    ],
+    'announcements' => [
+        'title' => 'Popups & Announcements',
+        'settings' => [
+            'popup_registration_enabled' => ['label' => 'Show Registration Popup', 'type' => 'boolean'],
+            'popup_registration_title' => ['label' => 'Registration Popup Title', 'type' => 'text', 'placeholder' => '2025/26 Registration Is Open!'],
+            'popup_registration_text' => ['label' => 'Registration Popup Message', 'type' => 'textarea', 'placeholder' => 'We have started registration...'],
+            'popup_registration_cta_text' => ['label' => 'Registration Button Text', 'type' => 'text', 'placeholder' => 'Register Your Child'],
+            'popup_registration_cta_link' => ['label' => 'Registration Button Link', 'type' => 'text', 'placeholder' => '/contact.php'],
+            'popup_promo_enabled' => ['label' => 'Show Promotional Popup', 'type' => 'boolean'],
+            'popup_promo_title' => ['label' => 'Promo Popup Title', 'type' => 'text', 'placeholder' => 'Why Families Choose Urji Beri'],
+            'popup_promo_text' => ['label' => 'Promo Popup Message', 'type' => 'textarea'],
+            'popup_promo_cta_text' => ['label' => 'Promo Button Text', 'type' => 'text', 'placeholder' => 'Learn More'],
+            'popup_promo_cta_link' => ['label' => 'Promo Button Link', 'type' => 'text', 'placeholder' => '/about.php'],
         ]
     ],
     'stats' => [
@@ -105,7 +130,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 // Update all settings from the submitted tab
                 foreach ($settingGroups[$tab]['settings'] as $key => $config) {
-                    $value = clean_input($_POST[$key] ?? '');
+                    if ($config['type'] === 'boolean') {
+                        $value = isset($_POST[$key]) ? '1' : '0';
+                    } else {
+                        $value = clean_input($_POST[$key] ?? '');
+                    }
                     update_setting($key, $value);
                 }
                 
@@ -185,6 +214,12 @@ include ADMIN_PATH . '/includes/admin_header.php';
                                           class="form-control" rows="4"
                                           <?php echo isset($config['placeholder']) ? 'placeholder="' . e($config['placeholder']) . '"' : ''; ?>
                                           <?php echo !empty($config['required']) ? 'required' : ''; ?>><?php echo e($currentSettings[$key] ?? ''); ?></textarea>
+                            <?php elseif ($config['type'] === 'boolean'): ?>
+                                <label class="settings-toggle">
+                                    <input type="checkbox" id="<?php echo $key; ?>" name="<?php echo $key; ?>" value="1"
+                                        <?php echo ($currentSettings[$key] ?? '0') === '1' ? 'checked' : ''; ?>>
+                                    <span>Enabled</span>
+                                </label>
                             <?php else: ?>
                                     <input type="<?php echo $config['type']; ?>" 
                                         id="<?php echo $key; ?>" 
@@ -292,6 +327,21 @@ include ADMIN_PATH . '/includes/admin_header.php';
     .settings-content {
         padding: 1.5rem;
     }
+}
+
+.settings-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    cursor: pointer;
+}
+
+.settings-toggle input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
 }
 </style>
 

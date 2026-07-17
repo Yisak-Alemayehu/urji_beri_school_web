@@ -8,7 +8,7 @@
 define('BASE_PATH', dirname(__DIR__));
 
 // URL Configuration (update for production)
-define('SITE_URL', 'http://localhost:8000');
+define('SITE_URL', 'https://urjiberischool.test');
 define('ADMIN_URL', SITE_URL . '/admin');
 
 // Directory paths

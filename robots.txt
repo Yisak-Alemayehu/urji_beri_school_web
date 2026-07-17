@@ -36,8 +36,8 @@ Allow: /assets/css/
 Allow: /assets/js/
 Allow: /assets/images/
 
-# Sitemap location
-Sitemap: http://localhost:8000/sitemap.php
+# Sitemap location (works on any domain)
+Sitemap: /sitemap.php
 
 # Crawl delay (optional - be nice to servers)
 Crawl-delay: 1

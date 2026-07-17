@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1E3A8A">
     <title>Admin Login | <?php echo e(get_setting('site_name')); ?></title>
     
     <!-- Favicon -->
@@ -49,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>">
@@ -58,11 +59,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="login-page">
         <div class="login-container">
+            <aside class="login-brand-panel" aria-label="Admin dashboard highlights">
+                <p class="login-brand-kicker">Urji Beri Admin</p>
+                <h2>One calm place to keep the school story current.</h2>
+                <div class="login-brand-grid">
+                    <span>News</span>
+                    <span>Gallery</span>
+                    <span>Messages</span>
+                    <span>Settings</span>
+                </div>
+                <p class="login-brand-note">Built for staff who need fast updates, clean publishing, and parent-facing content that always feels polished.</p>
+            </aside>
+
             <div class="login-card">
                 <div class="login-header">
                     <img src="<?php echo asset_url('images/logo.png'); ?>" alt="<?php echo e(get_setting('site_name')); ?>" class="login-logo">
-                    <h1 class="login-title">Admin Login</h1>
-                    <p class="login-subtitle">Sign in to manage your website</p>
+                    <h1 class="login-title">School Command Center</h1>
+                    <p class="login-subtitle">Sign in to manage stories, gallery moments, messages, and school settings.</p>
                 </div>
                 
                 <?php if ($error): ?>

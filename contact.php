@@ -23,6 +23,7 @@ $breadcrumbSchema = generate_breadcrumb_schema([
     'Home' => SITE_URL,
     'Contact Us' => SITE_URL . '/contact.php'
 ]);
+$contactPageSchema = generate_contact_page_schema();
 
 $errors = [];
 $success = false;
@@ -248,18 +249,54 @@ include INCLUDES_PATH . '/header.php';
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Map -->
-                    <div class="contact-map mt-6">
-                        <iframe 
-                            src="https://www.openstreetmap.org/export/embed.html?bbox=<?php echo ($mapLng - 0.01); ?>%2C<?php echo ($mapLat - 0.01); ?>%2C<?php echo ($mapLng + 0.01); ?>%2C<?php echo ($mapLat + 0.01); ?>&layer=mapnik&marker=<?php echo $mapLat; ?>%2C<?php echo $mapLng; ?>"
-                            style="border:0; width: 100%; height: 100%;" 
-                            allowfullscreen="" 
-                            loading="lazy"
-                            title="School Location Map">
-                        </iframe>
-                    </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Google Maps Showcase -->
+    <section class="map-showcase-section" aria-label="School location on Google Maps">
+        <div class="container">
+            <div class="map-showcase-header">
+                <p class="section-kicker">Find Us</p>
+                <h2 class="section-title">Visit Urji Beri School</h2>
+                <p class="section-subtitle">Plan your campus visit — we're easy to reach from Alemgena and surrounding areas.</p>
+            </div>
+            <div class="map-showcase">
+                <div class="map-showcase-frame">
+                    <iframe
+                        class="map-showcase-embed"
+                        src="<?php echo e(get_google_maps_embed_url()); ?>"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="<?php echo e(get_setting('site_name')); ?> on Google Maps">
+                    </iframe>
+                    <div class="map-showcase-glow" aria-hidden="true"></div>
+                </div>
+                <aside class="map-showcase-card glass-card-solid">
+                    <span class="map-showcase-badge">Campus Location</span>
+                    <h3><?php echo e(get_setting('site_name', 'Urji Beri School')); ?></h3>
+                    <p class="map-showcase-address"><?php echo e(get_setting('contact_address')); ?></p>
+                    <ul class="map-showcase-meta">
+                        <li>
+                            <strong>Phone</strong>
+                            <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', get_setting('contact_phone')); ?>"><?php echo e(get_setting('contact_phone')); ?></a>
+                        </li>
+                        <li>
+                            <strong>Email</strong>
+                            <a href="mailto:<?php echo e(get_setting('contact_email')); ?>"><?php echo e(get_setting('contact_email')); ?></a>
+                        </li>
+                    </ul>
+                    <div class="map-showcase-actions">
+                        <a href="<?php echo e(get_google_maps_directions_url()); ?>" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                            Get Directions
+                        </a>
+                        <a href="https://www.google.com/maps?q=<?php echo e($mapLat); ?>,<?php echo e($mapLng); ?>" class="btn btn-outline" target="_blank" rel="noopener noreferrer">
+                            Open in Google Maps
+                        </a>
+                    </div>
+                </aside>
             </div>
         </div>
     </section>

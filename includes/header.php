@@ -30,26 +30,33 @@ $seo = isset($pageSeo) ? array_merge($seoDefaults, $pageSeo) : $seoDefaults;
     <!-- Primary Meta Tags -->
     <title><?php echo e($seo['title']); ?></title>
     <?php echo generate_seo_meta($seo); ?>
+    <?php echo generate_seo_verification_meta(); ?>
     
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#3679ff">
-    <meta name="msapplication-TileColor" content="#3679ff">
+    <meta name="theme-color" content="#1E3A8A">
+    <meta name="msapplication-TileColor" content="#1E3A8A">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Urji Beri">
     <meta name="application-name" content="Urji Beri School">
+    <meta name="site-url" content="<?php echo SITE_URL; ?>">
     <meta name="msapplication-TileImage" content="<?php echo asset_url('images/icon-144.png'); ?>">
     
     <!-- Additional SEO Meta Tags -->
+    <?php
+    $mapLat = get_setting('map_latitude', '8.9806');
+    $mapLng = get_setting('map_longitude', '38.7578');
+    $canonicalPage = get_canonical_url();
+    ?>
     <meta name="geo.region" content="ET-OR">
     <meta name="geo.placename" content="Alemgena, Oromia">
-    <meta name="geo.position" content="8.9806;38.6218">
-    <meta name="ICBM" content="8.9806, 38.6218">
+    <meta name="geo.position" content="<?php echo e($mapLat); ?>;<?php echo e($mapLng); ?>">
+    <meta name="ICBM" content="<?php echo e($mapLat); ?>, <?php echo e($mapLng); ?>">
     
     <!-- Language Alternates -->
-    <link rel="alternate" hreflang="en" href="<?php echo SITE_URL; ?>">
-    <link rel="alternate" hreflang="x-default" href="<?php echo SITE_URL; ?>">
+    <link rel="alternate" hreflang="en" href="<?php echo e($canonicalPage); ?>">
+    <link rel="alternate" hreflang="x-default" href="<?php echo e($canonicalPage); ?>">
     
     <!-- Favicon & App Icons -->
     <link rel="icon" type="image/x-icon" href="<?php echo asset_url('images/favicon.ico'); ?>">
@@ -64,7 +71,7 @@ $seo = isset($pageSeo) ? array_merge($seoDefaults, $pageSeo) : $seoDefaults;
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>?v=<?php echo time(); ?>">
@@ -84,12 +91,16 @@ $seo = isset($pageSeo) ? array_merge($seoDefaults, $pageSeo) : $seoDefaults;
     <?php if (isset($breadcrumbSchema)): ?>
     <?php echo $breadcrumbSchema; ?>
     <?php endif; ?>
+    <?php if (isset($contactPageSchema)): ?>
+    <?php echo $contactPageSchema; ?>
+    <?php endif; ?>
     
     <?php if (isset($extraCss)): ?>
         <?php echo $extraCss; ?>
     <?php endif; ?>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <!-- Header -->
     <header class="header" id="header">
         <div class="container">
@@ -105,16 +116,18 @@ $seo = isset($pageSeo) ? array_merge($seoDefaults, $pageSeo) : $seoDefaults;
                     <a href="<?php echo SITE_URL; ?>/director.php" class="nav-link <?php echo $currentPage === 'director' ? 'active' : ''; ?>" title="Message from the Director">Director's Welcome</a>
                     <a href="<?php echo SITE_URL; ?>/gallery.php" class="nav-link <?php echo $currentPage === 'gallery' ? 'active' : ''; ?>" title="Photo Gallery">Gallery</a>
                     <a href="<?php echo SITE_URL; ?>/blog.php" class="nav-link <?php echo $currentPage === 'blog' ? 'active' : ''; ?>" title="Latest News & Events">News</a>
-                    <a href="https://result.urjiberischool.com/view_score.php" class="nav-link" target="_blank" rel="noopener" title="Check Student Results Online">Online Result</a>
-                    <a href="https://result.urjiberischool.com/login.php" class="nav-link" target="_blank" rel="noopener" title="Teachers Portal Login">Teachers Login</a>
+                    <a href="<?php echo e(get_setting('online_result_url', 'https://sms.urjiberischool.com/portal/login?')); ?>" class="nav-link nav-link-app" target="_blank" rel="noopener" title="Students & Parents App — results, attendance, fees">Students/Parents App</a>
+                    <a href="<?php echo e(get_setting('teacher_login_url', 'https://sms.urjiberischool.com/teacher-portal/login?')); ?>" class="nav-link nav-link-app" target="_blank" rel="noopener" title="Teachers App — sign in to UBS Teacher">Teachers App</a>
                     <a href="<?php echo SITE_URL; ?>/contact.php" class="nav-link <?php echo $currentPage === 'contact' ? 'active' : ''; ?>" title="Contact Us">Contact</a>
                 </nav>
                 
-                <div class="nav-toggle" id="navToggle" aria-label="Toggle Navigation Menu">
+                <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle Navigation Menu" aria-expanded="false" aria-controls="navMenu">
                     <span></span>
                     <span></span>
                     <span></span>
-                </div>
+                </button>
             </div>
         </div>
     </header>
+    
+    <main id="main-content">

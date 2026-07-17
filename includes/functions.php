@@ -412,6 +412,12 @@ function generate_seo_meta($seo = []) {
     
     $seo = array_merge($defaults, $seo);
     
+    // Clean canonical URL (strip tracking params, keep meaningful query strings on blog)
+    if (empty($seo['canonical'])) {
+        $seo['canonical'] = get_canonical_url();
+    }
+    $seo['url'] = $seo['canonical'];
+    
     // Build meta tags
     $meta = '';
     
@@ -433,6 +439,7 @@ function generate_seo_meta($seo = []) {
     $meta .= '    <meta property="og:title" content="' . e($seo['title']) . '">' . "\n";
     $meta .= '    <meta property="og:description" content="' . e($seo['description']) . '">' . "\n";
     $meta .= '    <meta property="og:image" content="' . e($seo['image']) . '">' . "\n";
+    $meta .= '    <meta property="og:image:alt" content="' . e($seo['image_alt'] ?? $seo['title']) . '">' . "\n";
     $meta .= '    <meta property="og:image:width" content="1200">' . "\n";
     $meta .= '    <meta property="og:image:height" content="630">' . "\n";
     $meta .= '    <meta property="og:site_name" content="' . e($siteName) . '">' . "\n";
@@ -462,7 +469,54 @@ function generate_seo_meta($seo = []) {
     $meta .= '    <meta name="twitter:title" content="' . e($seo['title']) . '">' . "\n";
     $meta .= '    <meta name="twitter:description" content="' . e($seo['description']) . '">' . "\n";
     $meta .= '    <meta name="twitter:image" content="' . e($seo['image']) . '">' . "\n";
+    $meta .= '    <meta name="twitter:image:alt" content="' . e($seo['image_alt'] ?? $seo['title']) . '">' . "\n";
     
+    $twitterSite = get_setting('social_twitter', '');
+    if ($twitterSite) {
+        $handle = strpos($twitterSite, 'twitter.com/') !== false
+            ? '@' . trim(parse_url($twitterSite, PHP_URL_PATH), '/')
+            : $twitterSite;
+        $meta .= '    <meta name="twitter:site" content="' . e($handle) . '">' . "\n";
+    }
+    
+    return $meta;
+}
+
+/**
+ * Build a clean canonical URL for the current request
+ */
+function get_canonical_url() {
+    $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    $query = [];
+    parse_str(parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_QUERY) ?? '', $query);
+
+    // Keep only SEO-meaningful query params
+    $allowed = ['slug', 'category'];
+    $filtered = array_intersect_key($query, array_flip($allowed));
+
+    $url = rtrim(SITE_URL, '/') . $path;
+    if (!empty($filtered)) {
+        $url .= '?' . http_build_query($filtered);
+    }
+
+    return $url;
+}
+
+/**
+ * Search engine verification meta tags
+ */
+function generate_seo_verification_meta() {
+    $meta = '';
+    $google = trim(get_setting('google_site_verification', ''));
+    $bing = trim(get_setting('bing_site_verification', ''));
+
+    if ($google) {
+        $meta .= '    <meta name="google-site-verification" content="' . e($google) . '">' . "\n";
+    }
+    if ($bing) {
+        $meta .= '    <meta name="msvalidate.01" content="' . e($bing) . '">' . "\n";
+    }
+
     return $meta;
 }
 
@@ -494,8 +548,8 @@ function generate_organization_schema() {
         ],
         'geo' => [
             '@type' => 'GeoCoordinates',
-            'latitude' => '8.9806',
-            'longitude' => '38.6218'
+            'latitude' => get_setting('map_latitude', '8.9806'),
+            'longitude' => get_setting('map_longitude', '38.7578')
         ],
         'sameAs' => array_filter([
             get_setting('social_facebook'),
@@ -690,9 +744,91 @@ function generate_school_schema() {
             'Science',
             'Social Studies'
         ],
-        'numberOfStudents' => get_setting('total_students', '500'),
+        'numberOfStudents' => get_setting('stat_students', get_setting('total_students', '550')),
         'priceRange' => '$$'
     ];
     
     return '<script type="application/ld+json">' . json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . '</script>';
+}
+
+/**
+ * Generate JSON-LD for ContactPage / LocalBusiness map
+ */
+function generate_contact_page_schema() {
+    $siteName = get_setting('site_name', 'Urji Beri School');
+    $siteUrl = SITE_URL;
+    $lat = get_setting('map_latitude', '8.9806');
+    $lng = get_setting('map_longitude', '38.7578');
+
+    $schema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'ContactPage',
+        'name' => 'Contact ' . $siteName,
+        'url' => $siteUrl . '/contact.php',
+        'description' => 'Contact ' . $siteName . ' for admissions, campus visits, and general inquiries.',
+        'mainEntity' => [
+            '@type' => 'School',
+            'name' => $siteName,
+            'telephone' => get_setting('contact_phone', '+251-912-097-003'),
+            'email' => get_setting('contact_email', 'office@urjiberischool.com'),
+            'url' => $siteUrl,
+            'address' => [
+                '@type' => 'PostalAddress',
+                'streetAddress' => get_setting('contact_address', 'Alemgena'),
+                'addressLocality' => 'Alemgena',
+                'addressRegion' => 'Oromia',
+                'addressCountry' => 'ET'
+            ],
+            'geo' => [
+                '@type' => 'GeoCoordinates',
+                'latitude' => $lat,
+                'longitude' => $lng
+            ],
+            'hasMap' => 'https://www.google.com/maps?q=' . $lat . ',' . $lng
+        ]
+    ];
+
+    return '<script type="application/ld+json">' . json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . '</script>';
+}
+
+/**
+ * Build Google Maps embed URL from settings
+ */
+function get_google_maps_embed_url() {
+    $lat = get_setting('map_latitude', '8.9806');
+    $lng = get_setting('map_longitude', '38.7578');
+    $zoom = (int) get_setting('map_zoom', 15);
+    $place = urlencode(get_setting('site_name', 'Urji Beri School') . ', ' . get_setting('contact_address', 'Alemgena'));
+
+    return 'https://maps.google.com/maps?q=' . $place . '&ll=' . $lat . ',' . $lng . '&z=' . $zoom . '&output=embed&hl=en';
+}
+
+/**
+ * Build Google Maps directions URL
+ */
+function get_google_maps_directions_url() {
+    $lat = get_setting('map_latitude', '8.9806');
+    $lng = get_setting('map_longitude', '38.7578');
+    return 'https://www.google.com/maps/dir/?api=1&destination=' . $lat . ',' . $lng;
+}
+
+/**
+ * Check if a boolean site setting is enabled
+ */
+function setting_is_enabled($key, $default = false) {
+    $value = get_setting($key, '');
+    if ($value === '' || $value === null) {
+        return $default;
+    }
+    return in_array(strtolower((string) $value), ['1', 'true', 'yes', 'on'], true);
+}
+
+/**
+ * Resolve relative site paths to full URLs
+ */
+function site_url_for($path) {
+    if (preg_match('/^https?:\/\//i', $path)) {
+        return $path;
+    }
+    return rtrim(SITE_URL, '/') . '/' . ltrim($path, '/');
 }

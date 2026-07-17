@@ -3,7 +3,7 @@
  * Enables offline functionality and PWA features
  */
 
-const CACHE_NAME = 'urji-admin-v1';
+const CACHE_NAME = 'urji-admin-v2';
 const OFFLINE_URL = '/admin/offline.html';
 
 // Resources to cache on install
@@ -12,7 +12,7 @@ const PRECACHE_RESOURCES = [
     '/assets/css/style.css',
     '/assets/css/admin.css',
     '/assets/js/admin.js',
-    'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap'
+    'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Syne:wght@600;700;800&display=swap'
 ];
 
 // Install event - cache resources

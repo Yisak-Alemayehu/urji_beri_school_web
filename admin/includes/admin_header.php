@@ -28,7 +28,7 @@ $unreadCount = $db->fetch("SELECT COUNT(*) as count FROM contact_messages WHERE 
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Urji Beri Admin">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#3679ff">
+    <meta name="theme-color" content="#1E3A8A">
     <title><?php echo isset($adminPageTitle) ? e($adminPageTitle) . ' - ' : ''; ?>Admin Dashboard | <?php echo e(get_setting('site_name')); ?></title>
     
     <!-- Favicon -->
@@ -41,11 +41,11 @@ $unreadCount = $db->fetch("SELECT COUNT(*) as count FROM contact_messages WHERE 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>">
-    <link rel="stylesheet" href="<?php echo asset_url('css/admin.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo asset_url('css/admin.css'); ?>?v=<?php echo time(); ?>">
 </head>
 <body>
     <div class="admin-wrapper">

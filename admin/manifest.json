@@ -4,8 +4,8 @@
     "description": "Admin Dashboard for Urji Beri School Website",
     "start_url": "/admin/index.php",
     "display": "standalone",
-    "background_color": "#f1f5f9",
-    "theme_color": "#3679ff",
+    "background_color": "#F8FAFC",
+    "theme_color": "#1E3A8A",
     "orientation": "portrait-primary",
     "icons": [
         {

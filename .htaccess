@@ -16,6 +16,12 @@ RewriteRule ^includes/ - [F,L]
 # RewriteCond %{REQUEST_FILENAME}\.php -f
 # RewriteRule ^(.*)$ $1.php [L]
 
+# Sitemap alias
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+# Custom error pages
+ErrorDocument 404 /404.php
+
 # Prevent directory listing
 Options -Indexes
 
@@ -60,5 +66,4 @@ AddDefaultCharset UTF-8
 </IfModule>
 
 # Custom error pages (uncomment and create these files if needed)
-# ErrorDocument 404 /404.php
 # ErrorDocument 500 /500.php

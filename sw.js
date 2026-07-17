@@ -3,7 +3,7 @@
  * Enables offline functionality and PWA features
  */
 
-const CACHE_NAME = 'urji-beri-v2';
+const CACHE_NAME = 'urji-beri-v4';
 const OFFLINE_URL = '/offline.html';
 
 // Static assets to cache (not dynamic PHP pages)

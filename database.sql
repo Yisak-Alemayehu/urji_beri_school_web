@@ -259,8 +259,8 @@ INSERT INTO site_settings (setting_key, setting_value, setting_type, setting_gro
 ('director_quote', '"The more that you read, the more things you will know. The more that you learn, the more places you\'ll go." – Dr. Seuss', 'text', 'director', 'Director quote'),
 
 -- External Links
-('online_result_url', '#', 'text', 'external', 'Online result system URL'),
-('teacher_login_url', '#', 'text', 'external', 'Teacher login portal URL'),
+('online_result_url', 'https://sms.urjiberischool.com/portal/login?', 'text', 'external', 'Students/parents app URL'),
+('teacher_login_url', 'https://sms.urjiberischool.com/teacher-portal/login?', 'text', 'external', 'Teachers app URL'),
 
 -- Homepage Content
 ('hero_title', 'Welcome to the official website of', 'text', 'homepage', 'Hero section title'),
@@ -270,6 +270,24 @@ INSERT INTO site_settings (setting_key, setting_value, setting_type, setting_gro
 ('cta_primary_link', '/about.php', 'text', 'homepage', 'Primary CTA button link'),
 ('cta_secondary_text', 'Contact Us', 'text', 'homepage', 'Secondary CTA button text'),
 ('cta_secondary_link', '/contact.php', 'text', 'homepage', 'Secondary CTA button link'),
+
+-- Homepage Statistics
+('stat_students', '550', 'text', 'stats', 'Total students shown on homepage'),
+('stat_teachers', '30', 'text', 'stats', 'Qualified teachers shown on homepage'),
+('stat_experience', '18', 'text', 'stats', 'Years of excellence shown on homepage'),
+('stat_programs', '98', 'text', 'stats', 'Parent satisfaction percentage on homepage'),
+
+-- Popups & Announcements
+('popup_registration_enabled', '1', 'boolean', 'announcements', 'Show registration popup'),
+('popup_registration_title', '2025/26 Registration Has Started!', 'text', 'announcements', 'Registration popup title'),
+('popup_registration_text', 'We have started registration for the new academic year. Families are welcome to visit our campus, ask questions, and register their children for preschool and elementary programs.', 'textarea', 'announcements', 'Registration popup message'),
+('popup_registration_cta_text', 'Register Your Child', 'text', 'announcements', 'Registration popup button'),
+('popup_registration_cta_link', '/contact.php', 'text', 'announcements', 'Registration popup link'),
+('popup_promo_enabled', '1', 'boolean', 'announcements', 'Show promotional popup'),
+('popup_promo_title', 'A School Families Trust', 'text', 'announcements', 'Promo popup title'),
+('popup_promo_text', 'Experienced teachers, comfortable classrooms, and a caring community for children ages 3 to 13. Come see why parents choose Urji Beri School.', 'textarea', 'announcements', 'Promo popup message'),
+('popup_promo_cta_text', 'Explore Our School', 'text', 'announcements', 'Promo popup button'),
+('popup_promo_cta_link', '/about.php', 'text', 'announcements', 'Promo popup link'),
 
 -- Registration CTA
 ('registration_title', 'Join Urji Beri School', 'text', 'homepage', 'Registration section title'),
@@ -340,3 +358,29 @@ CREATE VIEW v_unread_messages AS
 SELECT * FROM contact_messages
 WHERE is_read = 0
 ORDER BY created_at DESC;
+
+-- =====================================================
+-- Upgrade: homepage statistics (run once on existing DBs)
+-- =====================================================
+INSERT INTO site_settings (setting_key, setting_value, setting_type, setting_group, description) VALUES
+('stat_students', '550', 'text', 'stats', 'Total students shown on homepage'),
+('stat_teachers', '30', 'text', 'stats', 'Qualified teachers shown on homepage'),
+('stat_experience', '18', 'text', 'stats', 'Years of excellence shown on homepage'),
+('stat_programs', '98', 'text', 'stats', 'Parent satisfaction percentage on homepage')
+ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);
+
+-- =====================================================
+-- Upgrade: SEO, popups, map zoom (run once on existing DBs)
+-- =====================================================
+INSERT INTO site_settings (setting_key, setting_value, setting_type, setting_group, description) VALUES
+('popup_registration_enabled', '1', 'boolean', 'announcements', 'Show registration popup'),
+('popup_registration_title', '2025/26 Registration Has Started!', 'text', 'announcements', 'Registration popup title'),
+('popup_registration_text', 'We have started registration for the new academic year. Families are welcome to visit our campus, ask questions, and register their children for preschool and elementary programs.', 'textarea', 'announcements', 'Registration popup message'),
+('popup_registration_cta_text', 'Register Your Child', 'text', 'announcements', 'Registration popup button'),
+('popup_registration_cta_link', '/contact.php', 'text', 'announcements', 'Registration popup link'),
+('popup_promo_enabled', '1', 'boolean', 'announcements', 'Show promotional popup'),
+('popup_promo_title', 'A School Families Trust', 'text', 'announcements', 'Promo popup title'),
+('popup_promo_text', 'Experienced teachers, comfortable classrooms, and a caring community for children ages 3 to 13. Come see why parents choose Urji Beri School.', 'textarea', 'announcements', 'Promo popup message'),
+('popup_promo_cta_text', 'Explore Our School', 'text', 'announcements', 'Promo popup button'),
+('popup_promo_cta_link', '/about.php', 'text', 'announcements', 'Promo popup link')
+ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);
