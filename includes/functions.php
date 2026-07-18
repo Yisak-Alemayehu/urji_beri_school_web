@@ -73,10 +73,18 @@ function display_flash() {
 }
 
 /**
+ * Internal settings cache reference (shared across helpers)
+ */
+function &settings_cache() {
+    static $settings = null;
+    return $settings;
+}
+
+/**
  * Get site setting from database
  */
 function get_setting($key, $default = '') {
-    static $settings = null;
+    $settings = &settings_cache();
     
     if ($settings === null) {
         $db = Database::getInstance();
@@ -91,20 +99,32 @@ function get_setting($key, $default = '') {
 }
 
 /**
+ * Clear cached settings so subsequent get_setting() calls reload from DB
+ */
+function clear_settings_cache() {
+    $settings = &settings_cache();
+    $settings = null;
+}
+
+/**
  * Update site setting
  */
 function update_setting($key, $value) {
     $db = Database::getInstance();
-    // Try to update, if no rows affected, insert
     $result = $db->query(
         "UPDATE site_settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?",
         [$value, $key]
     );
     if ($result->rowCount() === 0) {
         $db->query(
-            "INSERT INTO site_settings (setting_key, setting_value, updated_at) VALUES (?, ?, NOW())",
+            "INSERT INTO site_settings (setting_key, setting_value, setting_type, setting_group, updated_at) VALUES (?, ?, 'text', 'general', NOW())",
             [$key, $value]
         );
+    }
+
+    $cache = &settings_cache();
+    if ($cache !== null) {
+        $cache[$key] = $value;
     }
 }
 
@@ -226,12 +246,22 @@ function upload_file($file, $directory, $allowedTypes = null) {
     }
     
     if (!in_array($mimeType, $allowedTypes)) {
-        return ['success' => false, 'error' => 'Invalid file type'];
+        // ICO files are often reported as octet-stream
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $icoAllowed = in_array('image/x-icon', $allowedTypes, true)
+            || in_array('image/vnd.microsoft.icon', $allowedTypes, true);
+        if (!($icoAllowed && $ext === 'ico' && in_array($mimeType, ['application/octet-stream', 'image/x-icon', 'image/vnd.microsoft.icon'], true))) {
+            return ['success' => false, 'error' => 'Invalid file type'];
+        }
     }
     
     // Get extension
     $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    if (!in_array($extension, ALLOWED_IMAGE_EXTENSIONS)) {
+    $allowedExtensions = ALLOWED_IMAGE_EXTENSIONS;
+    if (in_array('image/x-icon', $allowedTypes, true) || in_array('image/vnd.microsoft.icon', $allowedTypes, true)) {
+        $allowedExtensions = array_merge($allowedExtensions, ['ico']);
+    }
+    if (!in_array($extension, $allowedExtensions, true)) {
         return ['success' => false, 'error' => 'Invalid file extension'];
     }
     
@@ -490,6 +520,254 @@ function asset_url($path) {
 }
 
 /**
+ * Cache-busting version for a local asset/upload path
+ */
+function asset_version($absolutePath) {
+    return is_file($absolutePath) ? (string) filemtime($absolutePath) : (string) time();
+}
+
+/**
+ * Branding defaults mapped to assets/images files
+ */
+function branding_defaults() {
+    return [
+        'site_logo' => 'images/logo.png',
+        'site_logo_white' => 'images/logo-white.png',
+        'site_favicon' => 'images/favicon.ico',
+        'site_favicon_32' => 'images/favicon-32x32.png',
+        'site_favicon_16' => 'images/favicon-16x16.png',
+        'site_apple_touch_icon' => 'images/apple-touch-icon.png',
+        'site_og_image' => 'images/og-image.jpg',
+        'site_icon_72' => 'images/icon-72.png',
+        'site_icon_96' => 'images/icon-96.png',
+        'site_icon_128' => 'images/icon-128.png',
+        'site_icon_144' => 'images/icon-144.png',
+        'site_icon_152' => 'images/icon-152.png',
+        'site_icon_192' => 'images/icon-192.png',
+        'site_icon_384' => 'images/icon-384.png',
+        'site_icon_512' => 'images/icon-512.png',
+    ];
+}
+
+/**
+ * Resolve absolute filesystem path for a branding setting
+ */
+function branding_path($key) {
+    $defaults = branding_defaults();
+    $defaultRel = $defaults[$key] ?? null;
+    $value = trim((string) get_setting($key, ''));
+
+    if ($value !== '') {
+        // Uploaded branding file
+        $uploadPath = UPLOADS_PATH . '/branding/' . basename($value);
+        if (is_file($uploadPath)) {
+            return $uploadPath;
+        }
+        // Legacy: bare filename under assets/images
+        $legacyPath = ASSETS_PATH . '/images/' . basename($value);
+        if (is_file($legacyPath)) {
+            return $legacyPath;
+        }
+    }
+
+    if ($defaultRel) {
+        $path = ASSETS_PATH . '/' . $defaultRel;
+        if (is_file($path)) {
+            return $path;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Public URL for a branding asset (logo, favicon, OG, PWA icons)
+ */
+function branding_url($key, $fallbackAsset = null) {
+    $path = branding_path($key);
+    if ($path) {
+        $normalized = str_replace('\\', '/', $path);
+        $uploadsRoot = str_replace('\\', '/', UPLOADS_PATH);
+        if (str_starts_with($normalized, $uploadsRoot . '/')) {
+            $url = upload_url(basename($path), 'branding');
+        } else {
+            $assetsRoot = str_replace('\\', '/', ASSETS_PATH);
+            $rel = ltrim(substr($normalized, strlen($assetsRoot)), '/');
+            $url = asset_url($rel);
+        }
+        return $url . '?v=' . asset_version($path);
+    }
+
+    $defaults = branding_defaults();
+    $asset = $fallbackAsset ?: ($defaults[$key] ?? 'images/logo.png');
+    return asset_url($asset);
+}
+
+/**
+ * Allowed MIME types for branding uploads (includes ICO)
+ */
+function branding_allowed_mime_types() {
+    return array_merge(ALLOWED_IMAGE_TYPES, [
+        'image/x-icon',
+        'image/vnd.microsoft.icon',
+        'image/ico',
+    ]);
+}
+
+/**
+ * Load an image resource from a path for GD processing
+ */
+function branding_load_image($path) {
+    if (!is_file($path) || !function_exists('imagecreatetruecolor')) {
+        return null;
+    }
+
+    $info = @getimagesize($path);
+    if (!$info) {
+        return null;
+    }
+
+    return match ($info[2]) {
+        IMAGETYPE_JPEG => @imagecreatefromjpeg($path),
+        IMAGETYPE_PNG => @imagecreatefrompng($path),
+        IMAGETYPE_GIF => @imagecreatefromgif($path),
+        IMAGETYPE_WEBP => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($path) : null,
+        default => null,
+    };
+}
+
+/**
+ * Resize source image to a square PNG and save under uploads/branding
+ */
+function branding_save_resized_png($sourcePath, $size, $filename) {
+    $src = branding_load_image($sourcePath);
+    if (!$src) {
+        return null;
+    }
+
+    $w = imagesx($src);
+    $h = imagesy($src);
+    $out = imagecreatetruecolor($size, $size);
+    imagealphablending($out, false);
+    imagesavealpha($out, true);
+    $transparent = imagecolorallocatealpha($out, 0, 0, 0, 127);
+    imagefilledrectangle($out, 0, 0, $size, $size, $transparent);
+    imagealphablending($out, true);
+    imagecopyresampled($out, $src, 0, 0, 0, 0, $size, $size, $w, $h);
+
+    $dir = UPLOADS_PATH . '/branding';
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
+
+    $full = $dir . '/' . $filename;
+    imagepng($out, $full);
+    imagedestroy($out);
+    imagedestroy($src);
+
+    return is_file($full) ? $filename : null;
+}
+
+/**
+ * Generate derived favicon / PWA icons from a primary logo upload
+ */
+function generate_branding_derivatives($sourceFilename) {
+    $sourcePath = UPLOADS_PATH . '/branding/' . $sourceFilename;
+    if (!is_file($sourcePath)) {
+        return [];
+    }
+
+    $prefix = pathinfo($sourceFilename, PATHINFO_FILENAME);
+    $map = [
+        'site_favicon_16' => 16,
+        'site_favicon_32' => 32,
+        'site_apple_touch_icon' => 180,
+        'site_icon_72' => 72,
+        'site_icon_96' => 96,
+        'site_icon_128' => 128,
+        'site_icon_144' => 144,
+        'site_icon_152' => 152,
+        'site_icon_192' => 192,
+        'site_icon_384' => 384,
+        'site_icon_512' => 512,
+    ];
+
+    $generated = [];
+    foreach ($map as $key => $size) {
+        $filename = $prefix . '_' . $size . '.png';
+        $saved = branding_save_resized_png($sourcePath, $size, $filename);
+        if ($saved) {
+            $old = get_setting($key, '');
+            if ($old && $old !== $saved && is_file(UPLOADS_PATH . '/branding/' . basename($old))) {
+                @unlink(UPLOADS_PATH . '/branding/' . basename($old));
+            }
+            update_setting($key, $saved);
+            $generated[$key] = $saved;
+        }
+    }
+
+    // Prefer 32px PNG as favicon when no dedicated ICO uploaded
+    if (!empty($generated['site_favicon_32'])) {
+        $currentFavicon = get_setting('site_favicon', '');
+        $faviconPath = $currentFavicon ? UPLOADS_PATH . '/branding/' . basename($currentFavicon) : '';
+        if ($currentFavicon === '' || !is_file($faviconPath)) {
+            update_setting('site_favicon', $generated['site_favicon_32']);
+            $generated['site_favicon'] = $generated['site_favicon_32'];
+        }
+    }
+
+    // OG image if missing
+    $og = get_setting('site_og_image', '');
+    if ($og === '' || !is_file(UPLOADS_PATH . '/branding/' . basename($og))) {
+        $src = branding_load_image($sourcePath);
+        if ($src) {
+            $tw = 1200;
+            $th = 630;
+            $w = imagesx($src);
+            $h = imagesy($src);
+            $out = imagecreatetruecolor($tw, $th);
+            $bg = imagecolorallocate($out, 30, 58, 138);
+            imagefill($out, 0, 0, $bg);
+            $scale = min(($tw * 0.45) / $w, ($th * 0.65) / $h);
+            $nw = (int) ($w * $scale);
+            $nh = (int) ($h * $scale);
+            imagecopyresampled($out, $src, (int) (($tw - $nw) / 2), (int) (($th - $nh) / 2), 0, 0, $nw, $nh, $w, $h);
+            $ogName = $prefix . '_og.jpg';
+            imagejpeg($out, UPLOADS_PATH . '/branding/' . $ogName, 90);
+            imagedestroy($out);
+            imagedestroy($src);
+            update_setting('site_og_image', $ogName);
+            $generated['site_og_image'] = $ogName;
+        }
+    }
+
+    return $generated;
+}
+
+/**
+ * Store an uploaded branding file and return the stored filename
+ */
+function store_branding_upload(array $file, $settingKey, $oldFilename = '') {
+    $result = upload_file($file, 'branding', branding_allowed_mime_types());
+    if (!$result['success']) {
+        return $result;
+    }
+
+    if ($oldFilename && is_file(UPLOADS_PATH . '/branding/' . basename($oldFilename))) {
+        // Don't delete if another setting still points at the same file
+        delete_file(basename($oldFilename), 'branding');
+    }
+
+    update_setting($settingKey, $result['filename']);
+
+    if ($settingKey === 'site_logo') {
+        generate_branding_derivatives($result['filename']);
+    }
+
+    return $result;
+}
+
+/**
  * Pagination helper
  */
 function paginate($totalItems, $currentPage, $perPage, $baseUrl) {
@@ -601,7 +879,7 @@ function generate_seo_meta($seo = []) {
         'title' => $siteName,
         'description' => get_setting('site_description', 'Urji Beri School - Quality preschool and elementary education in Alemgena, Oromia. Nurturing young minds for a brighter future.'),
         'keywords' => get_setting('site_keywords', 'Urji Beri School, elementary school, preschool, Alemgena, Oromia, education, Ethiopia, nursery school, kindergarten'),
-        'image' => asset_url('images/og-image.jpg'),
+        'image' => branding_url('site_og_image'),
         'url' => $siteUrl . $_SERVER['REQUEST_URI'],
         'type' => 'website',
         'locale' => 'en_US',
@@ -740,8 +1018,8 @@ function generate_organization_schema() {
         'name' => $siteName,
         'alternateName' => 'Urji Beri',
         'url' => $siteUrl,
-        'logo' => asset_url('images/logo.png'),
-        'image' => asset_url('images/og-image.jpg'),
+        'logo' => branding_url('site_logo'),
+        'image' => branding_url('site_og_image'),
         'description' => get_setting('site_description', 'Quality preschool and elementary education in Alemgena, Oromia.'),
         'telephone' => get_setting('contact_phone', '+251-912-097-003'),
         'email' => get_setting('contact_email', 'office@urjiberischool.com'),
@@ -794,7 +1072,7 @@ function generate_website_schema() {
             '@type' => 'SearchAction',
             'target' => [
                 '@type' => 'EntryPoint',
-                'urlTemplate' => $siteUrl . '/blog.php?search={search_term_string}'
+                'urlTemplate' => route_url('blog') . '?search={search_term_string}'
             ],
             'query-input' => 'required name=search_term_string'
         ]
@@ -815,7 +1093,7 @@ function generate_article_schema($post) {
         '@type' => 'Article',
         'headline' => $post['title'],
         'description' => $post['excerpt'] ?? truncate(strip_tags($post['content']), 160),
-        'image' => $post['featured_image'] ? upload_url('blog/' . $post['featured_image']) : asset_url('images/og-image.jpg'),
+        'image' => $post['featured_image'] ? upload_url($post['featured_image'], 'blog') : branding_url('site_og_image'),
         'datePublished' => date('c', strtotime($post['published_at'])),
         'dateModified' => date('c', strtotime($post['updated_at'] ?? $post['published_at'])),
         'author' => [
@@ -828,12 +1106,12 @@ function generate_article_schema($post) {
             'name' => $siteName,
             'logo' => [
                 '@type' => 'ImageObject',
-                'url' => asset_url('images/logo.png')
+                'url' => branding_url('site_logo')
             ]
         ],
         'mainEntityOfPage' => [
             '@type' => 'WebPage',
-            '@id' => $siteUrl . '/blog-detail.php?slug=' . $post['slug']
+            '@id' => route_url('blog-detail', ['slug' => $post['slug']])
         ],
         'articleSection' => $post['category_name'] ?? 'News',
         'wordCount' => str_word_count(strip_tags($post['content']))
@@ -865,7 +1143,7 @@ function generate_gallery_schema($images, $categoryName = 'Gallery') {
         '@type' => 'ImageGallery',
         'name' => $categoryName . ' - ' . $siteName,
         'description' => 'Photo gallery of ' . $categoryName . ' at ' . $siteName,
-        'url' => $siteUrl . '/gallery.php',
+        'url' => route_url('gallery'),
         'image' => $imageObjects,
         'publisher' => [
             '@type' => 'Organization',
@@ -915,8 +1193,8 @@ function generate_school_schema() {
         'name' => $siteName,
         'description' => get_setting('about_overview', 'Leading preschool and elementary institution serving children ages 3-13.'),
         'url' => $siteUrl,
-        'logo' => asset_url('images/logo.png'),
-        'image' => asset_url('images/school-building.jpg'),
+        'logo' => branding_url('site_logo'),
+        'image' => branding_url('site_og_image'),
         'telephone' => get_setting('contact_phone', '+251-912-097-003'),
         'email' => get_setting('contact_email', 'office@urjiberischool.com'),
         'address' => [
@@ -931,7 +1209,7 @@ function generate_school_schema() {
             '@type' => 'Place',
             'name' => 'Alemgena, Oromia, Ethiopia'
         ],
-        'foundingDate' => get_setting('founding_year', '2015'),
+        'foundingDate' => get_setting('founding_year', get_setting('school_established', '2022')),
         'educationalCredentialAwarded' => 'Elementary School Certificate',
         'hasCredential' => [
             '@type' => 'EducationalOccupationalCredential',

@@ -15,7 +15,13 @@ $pageSeo = [
     'title' => "Director's Welcome - " . get_setting('site_name', 'Urji Beri School'),
     'description' => 'A warm welcome message from ' . $directorName . ', Director of Urji Beri School. Learn about our educational philosophy and commitment to student success.',
     'keywords' => 'Urji Beri School director, school leadership, welcome message, educational philosophy, Alemgena school principal',
-    'image' => get_setting('director_photo') ? upload_url('director/' . get_setting('director_photo')) : asset_url('images/og-image.jpg'),
+    'image' => (function () {
+        $img = get_setting('director_image');
+        if ($img && is_file(UPLOADS_PATH . '/director/' . $img)) {
+            return upload_url($img, 'director');
+        }
+        return branding_url('site_og_image');
+    })(),
     'type' => 'profile'
 ];
 
@@ -49,33 +55,34 @@ include INCLUDES_PATH . '/header.php';
     <!-- Director's Message Section -->
     <section class="section">
         <div class="container">
-            <div class="glass-card-solid">
+            <div class="glass-card-solid director-panel">
                 <div class="director-content">
                     <div class="director-image">
-                        <?php 
+                        <?php
                         $directorImage = get_setting('director_image');
-                        if ($directorImage && file_exists(UPLOADS_PATH . '/director/' . $directorImage)): 
+                        $directorImageUrl = ($directorImage && is_file(UPLOADS_PATH . '/director/' . $directorImage))
+                            ? upload_url($directorImage, 'director')
+                            : asset_url('images/director-placeholder.jpg');
                         ?>
-                            <img src="<?php echo upload_url($directorImage, 'director'); ?>" alt="<?php echo e(get_setting('director_name')); ?>">
-                        <?php else: ?>
-                            <img src="<?php echo asset_url('images/director-placeholder.jpg'); ?>" alt="School Director">
-                        <?php endif; ?>
+                        <img src="<?php echo e($directorImageUrl); ?>" alt="<?php echo e(get_setting('director_name', 'School Director')); ?>">
                         <h3 class="director-name"><?php echo e(get_setting('director_name', 'School Director')); ?></h3>
                         <p class="director-title"><?php echo e(get_setting('director_title', 'School Director')); ?></p>
                     </div>
-                    
+
                     <div class="director-message">
-                        <?php 
-                        $message = get_setting('director_message');
-                        // Convert paragraphs
-                        $paragraphs = explode("\n\n", $message);
-                        foreach ($paragraphs as $paragraph): 
-                            if (trim($paragraph)):
-                        ?>
-                            <p><?php echo nl2br(e(trim($paragraph))); ?></p>
-                        <?php 
-                            endif;
-                        endforeach; 
+                        <?php
+                        $message = trim((string) get_setting(
+                            'director_message',
+                            "I would like to take this opportunity to welcome you to our website and thank you for considering Urji Beri School as an educational home for your children.\n\nAt UBS we are committed to developing and empowering future innovators and leaders. We invite you to become close partners in this important task."
+                        ));
+                        $paragraphs = preg_split("/\n\s*\n/", $message) ?: [$message];
+                        foreach ($paragraphs as $paragraph) {
+                            $paragraph = trim($paragraph);
+                            if ($paragraph === '') {
+                                continue;
+                            }
+                            echo '<p>' . nl2br(e($paragraph)) . '</p>';
+                        }
                         ?>
                     </div>
                 </div>

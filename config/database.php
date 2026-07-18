@@ -12,12 +12,12 @@ if (!defined('BASE_PATH')) {
     exit('Direct access not allowed');
 }
 
-// Database configuration
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'urji_beri_school');
-define('DB_USER', 'root');
-define('DB_PASS', '0000');
-define('DB_CHARSET', 'utf8mb4');
+// Database configuration (from .env)
+define('DB_HOST', (string) env('DB_HOST', 'localhost'));
+define('DB_NAME', (string) env('DB_NAME', 'urji_beri_school'));
+define('DB_USER', (string) env('DB_USER', 'root'));
+define('DB_PASS', (string) env('DB_PASS', ''));
+define('DB_CHARSET', (string) env('DB_CHARSET', 'utf8mb4'));
 
 // PDO options for secure connections
 $pdoOptions = [

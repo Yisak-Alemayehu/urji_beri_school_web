@@ -1,0 +1,45 @@
+# ===== Environment & secrets =====
+.env
+.env.*
+!.env.example
+config/database.local.php
+
+# ===== Dependencies =====
+/vendor/
+/node_modules/
+
+# ===== Uploads (keep folders, ignore files) =====
+/uploads/blog/*
+!/uploads/blog/.gitkeep
+/uploads/gallery/*
+!/uploads/gallery/.gitkeep
+/uploads/director/*
+!/uploads/director/.gitkeep
+/uploads/branding/*
+!/uploads/branding/.gitkeep
+
+# ===== Logs & cache =====
+*.log
+/logs/
+/cache/
+/tmp/
+
+# ===== OS files =====
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ===== Editors / IDEs =====
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ===== Cursor =====
+.cursor/
+.git/cursor/
+
+# ===== PHP =====
+.phpunit.result.cache
+.php-cs-fixer.cache

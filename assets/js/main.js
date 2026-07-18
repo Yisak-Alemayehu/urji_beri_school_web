@@ -337,6 +337,7 @@ function initScrollReveal() {
     window.addEventListener('load', revealInView);
 
     // Safety net — never leave content hidden
+    setTimeout(revealAllAnimated, 600);
     setTimeout(revealAllAnimated, 2000);
 }
 

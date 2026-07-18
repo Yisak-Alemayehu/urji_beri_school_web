@@ -47,9 +47,9 @@ CREATE TABLE users (
     INDEX idx_user_active (is_active)
 ) ENGINE=InnoDB;
 
--- Insert default admin user (password: Admin@123)
+-- Insert default admin user (password: Admin@123) — CHANGE THIS IMMEDIATELY IN PRODUCTION
 INSERT INTO users (role_id, username, email, password, full_name) VALUES 
-(1, 'admin', 'admin@urjiberischool.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System Administrator');
+(1, 'admin', 'admin@urjiberischool.com', '$2y$12$FOoRXg49Ihn4kSEf6.89KulIJ4V/jG214CCrcN4VoH6LvVmSA5WsC', 'System Administrator');
 
 -- =====================================================
 -- TABLE: blog_categories
@@ -208,8 +208,29 @@ INSERT INTO site_settings (setting_key, setting_value, setting_type, setting_gro
 ('social_instagram', '', 'text', 'social', 'Instagram profile URL'),
 ('social_youtube', '', 'text', 'social', 'YouTube channel URL'),
 ('social_telegram', '', 'text', 'social', 'Telegram channel URL'),
-('site_logo', 'logo.png', 'image', 'general', 'Site logo'),
-('site_favicon', 'favicon.ico', 'image', 'general', 'Site favicon'),
+('site_logo', '', 'image', 'branding', 'Primary site logo (uploads/branding or default assets)'),
+('site_logo_white', '', 'image', 'branding', 'White/footer logo'),
+('site_favicon', '', 'image', 'branding', 'Site favicon'),
+('site_favicon_16', '', 'image', 'branding', '16x16 favicon'),
+('site_favicon_32', '', 'image', 'branding', '32x32 favicon'),
+('site_apple_touch_icon', '', 'image', 'branding', 'Apple touch icon'),
+('site_og_image', '', 'image', 'branding', 'Open Graph share image'),
+('site_icon_72', '', 'image', 'branding', 'PWA icon 72'),
+('site_icon_96', '', 'image', 'branding', 'PWA icon 96'),
+('site_icon_128', '', 'image', 'branding', 'PWA icon 128'),
+('site_icon_144', '', 'image', 'branding', 'PWA icon 144'),
+('site_icon_152', '', 'image', 'branding', 'PWA icon 152'),
+('site_icon_192', '', 'image', 'branding', 'PWA icon 192'),
+('site_icon_384', '', 'image', 'branding', 'PWA icon 384'),
+('site_icon_512', '', 'image', 'branding', 'PWA icon 512'),
+('contact_phone_2', '', 'text', 'contact', 'Secondary contact phone'),
+('office_hours_weekday', 'Monday - Friday: 8:00 AM - 5:00 PM', 'text', 'hours', 'Weekday office hours'),
+('office_hours_saturday', 'Saturday: 8:00 AM - 12:00 PM', 'text', 'hours', 'Saturday office hours'),
+('office_hours_note', 'Sunday: Closed', 'text', 'hours', 'Additional hours note'),
+('social_twitter', '', 'text', 'social', 'Twitter/X profile URL'),
+('social_linkedin', '', 'text', 'social', 'LinkedIn profile URL'),
+('online_result_url', 'https://sms.urjiberischool.com/portal/login?', 'text', 'external', 'Students/parents app URL'),
+('teacher_login_url', 'https://sms.urjiberischool.com/teacher-portal/login?', 'text', 'external', 'Teachers app URL'),
 
 -- Contact Information
 ('contact_email', 'office@urjiberischool.com', 'text', 'contact', 'Contact email'),
@@ -384,3 +405,33 @@ INSERT INTO site_settings (setting_key, setting_value, setting_type, setting_gro
 ('popup_promo_cta_text', 'Explore Our School', 'text', 'announcements', 'Promo popup button'),
 ('popup_promo_cta_link', '/about.php', 'text', 'announcements', 'Promo popup link')
 ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);
+
+-- =====================================================
+-- Upgrade: branding, hours, external links (existing DBs)
+-- =====================================================
+INSERT INTO site_settings (setting_key, setting_value, setting_type, setting_group, description) VALUES
+('site_logo', '', 'image', 'branding', 'Primary site logo'),
+('site_logo_white', '', 'image', 'branding', 'White/footer logo'),
+('site_favicon', '', 'image', 'branding', 'Site favicon'),
+('site_favicon_16', '', 'image', 'branding', '16x16 favicon'),
+('site_favicon_32', '', 'image', 'branding', '32x32 favicon'),
+('site_apple_touch_icon', '', 'image', 'branding', 'Apple touch icon'),
+('site_og_image', '', 'image', 'branding', 'Open Graph share image'),
+('site_icon_72', '', 'image', 'branding', 'PWA icon 72'),
+('site_icon_96', '', 'image', 'branding', 'PWA icon 96'),
+('site_icon_128', '', 'image', 'branding', 'PWA icon 128'),
+('site_icon_144', '', 'image', 'branding', 'PWA icon 144'),
+('site_icon_152', '', 'image', 'branding', 'PWA icon 152'),
+('site_icon_192', '', 'image', 'branding', 'PWA icon 192'),
+('site_icon_384', '', 'image', 'branding', 'PWA icon 384'),
+('site_icon_512', '', 'image', 'branding', 'PWA icon 512'),
+('founding_year', '2022', 'text', 'general', 'School founding year'),
+('contact_phone_2', '', 'text', 'contact', 'Secondary contact phone'),
+('office_hours_weekday', 'Monday - Friday: 8:00 AM - 5:00 PM', 'text', 'hours', 'Weekday office hours'),
+('office_hours_saturday', 'Saturday: 8:00 AM - 12:00 PM', 'text', 'hours', 'Saturday office hours'),
+('office_hours_note', 'Sunday: Closed', 'text', 'hours', 'Additional hours note'),
+('social_twitter', '', 'text', 'social', 'Twitter/X profile URL'),
+('social_linkedin', '', 'text', 'social', 'LinkedIn profile URL'),
+('online_result_url', 'https://sms.urjiberischool.com/portal/login?', 'text', 'external', 'Students/parents app URL'),
+('teacher_login_url', 'https://sms.urjiberischool.com/teacher-portal/login?', 'text', 'external', 'Teachers app URL')
+ON DUPLICATE KEY UPDATE setting_key = setting_key;

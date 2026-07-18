@@ -68,21 +68,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // If no errors, save to database
         if (empty($errors)) {
-            try {
-                $db->query(
-                    "INSERT INTO contact_messages (name, email, phone, subject, message, ip_address, created_at) 
-                     VALUES (?, ?, ?, ?, ?, ?, NOW())",
-                    [$name, $email, $phone, $subject, $message, get_client_ip()]
-                );
-                
-                $success = true;
-                
-                // Clear form data on success
-                $name = $email = $phone = $subject = $message = '';
-                
-            } catch (Exception $e) {
-                error_log("Contact form error: " . $e->getMessage());
-                $errors[] = 'An error occurred. Please try again later.';
+            // Simple anti-spam: limit submissions per session
+            $lastSubmit = $_SESSION['contact_last_submit'] ?? 0;
+            if (time() - (int) $lastSubmit < 30) {
+                $errors[] = 'Please wait a moment before sending another message.';
+            } else {
+                try {
+                    $db->query(
+                        "INSERT INTO contact_messages (name, email, phone, subject, message, ip_address, created_at) 
+                         VALUES (?, ?, ?, ?, ?, ?, NOW())",
+                        [$name, $email, $phone, $subject, $message, get_client_ip()]
+                    );
+                    
+                    $success = true;
+                    $_SESSION['contact_last_submit'] = time();
+                    
+                    // Clear form data on success
+                    $name = $email = $phone = $subject = $message = '';
+                    
+                } catch (Exception $e) {
+                    error_log("Contact form error: " . $e->getMessage());
+                    $errors[] = 'An error occurred. Please try again later.';
+                }
             }
         }
     }
@@ -220,7 +227,10 @@ include INCLUDES_PATH . '/header.php';
                             </div>
                             <div class="contact-details">
                                 <h4>Phone Number</h4>
-                                <p><a href="tel:<?php echo e(get_setting('contact_phone')); ?>"><?php echo e(get_setting('contact_phone')); ?></a></p>
+                                <p><a href="tel:<?php echo preg_replace('/[^0-9+]/', '', get_setting('contact_phone')); ?>"><?php echo e(get_setting('contact_phone')); ?></a></p>
+                                <?php if (get_setting('contact_phone_2')): ?>
+                                    <p><a href="tel:<?php echo preg_replace('/[^0-9+]/', '', get_setting('contact_phone_2')); ?>"><?php echo e(get_setting('contact_phone_2')); ?></a></p>
+                                <?php endif; ?>
                             </div>
                         </div>
                         
@@ -236,6 +246,29 @@ include INCLUDES_PATH . '/header.php';
                                 <p><a href="mailto:<?php echo e(get_setting('contact_email')); ?>"><?php echo e(get_setting('contact_email')); ?></a></p>
                             </div>
                         </div>
+
+                        <?php if (get_setting('office_hours_weekday') || get_setting('office_hours_saturday') || get_setting('office_hours_note')): ?>
+                        <div class="contact-item">
+                            <div class="contact-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Office Hours</h4>
+                                <?php if (get_setting('office_hours_weekday')): ?>
+                                    <p><?php echo e(get_setting('office_hours_weekday')); ?></p>
+                                <?php endif; ?>
+                                <?php if (get_setting('office_hours_saturday')): ?>
+                                    <p><?php echo e(get_setting('office_hours_saturday')); ?></p>
+                                <?php endif; ?>
+                                <?php if (get_setting('office_hours_note')): ?>
+                                    <p><?php echo e(get_setting('office_hours_note')); ?></p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <?php endif; ?>
                         
                         <div class="contact-item">
                             <div class="contact-icon">

@@ -37,8 +37,12 @@ RewriteRule ^ - [L]
 # Sitemap alias
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
 
-# Front controller — clean URLs
-RewriteRule ^ router.php [L,QSA]
+# Legacy static manifest → dynamic
+RewriteRule ^manifest\.json$ manifest.php [L]
+RewriteRule ^admin/manifest\.json$ admin/manifest.php [L]
+
+# Front controller — clean URLs (index.php also handles nginx try_files fallbacks)
+RewriteRule ^ index.php [L,QSA]
 
 # Custom error pages
 ErrorDocument 404 /404.php
@@ -49,11 +53,10 @@ Options -Indexes
 # Set default charset
 AddDefaultCharset UTF-8
 
-# Protect .htaccess file
-<Files .htaccess>
-    Order allow,deny
-    Deny from all
-</Files>
+# Protect .htaccess and .env files
+<FilesMatch "^(\.htaccess|\.env|\.env\..*)$">
+    Require all denied
+</FilesMatch>
 
 # Protect PHP files in uploads directory
 <FilesMatch "\.php$">

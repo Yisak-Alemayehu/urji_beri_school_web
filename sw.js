@@ -3,7 +3,7 @@
  * Enables offline functionality and PWA features
  */
 
-const CACHE_NAME = 'urji-beri-v5';
+const CACHE_NAME = 'urji-beri-v6';
 const OFFLINE_URL = '/offline.html';
 
 // Static assets to cache (not dynamic PHP pages)
@@ -13,7 +13,9 @@ const STATIC_ASSETS = [
     '/assets/js/main.js',
     '/assets/images/logo.png',
     '/assets/images/logo-white.png',
-    '/manifest.json'
+    '/assets/images/favicon-32x32.png',
+    '/assets/images/icon-192.png',
+    '/manifest.php'
 ];
 
 // Install event - cache static assets only
@@ -55,6 +57,7 @@ function isStaticAsset(url) {
            url.endsWith('.woff') ||
            url.endsWith('.woff2') ||
            url.endsWith('.ico') ||
+           url.includes('manifest.php') ||
            url.includes('manifest.json');
 }
 

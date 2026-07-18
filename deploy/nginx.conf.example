@@ -1,0 +1,28 @@
+# Laragon / Nginx site config for Urji Beri School
+# Copy the location / block into your site's server { } section,
+# or replace try_files so unknown paths go to index.php (not a blank 404).
+
+# Example:
+#
+# server {
+#     listen 80;
+#     listen 443 ssl;
+#     server_name urjiberischool.test;
+#     root C:/Users/yisak/Desktop/urji_beri_school_web;
+#     index index.php;
+#
+#     location / {
+#         try_files $uri $uri/ /index.php?$query_string;
+#     }
+#
+#     location ~ \.php$ {
+#         include snippets/fastcgi-php.conf;
+#         fastcgi_pass php_upstream; # or 127.0.0.1:9000 / laragon sock
+#     }
+#
+#     location ~ ^/(config|includes)/ {
+#         deny all;
+#     }
+# }
+
+# Important: try_files must end with /index.php — not /index.html

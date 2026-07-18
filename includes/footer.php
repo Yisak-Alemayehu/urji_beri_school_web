@@ -6,7 +6,7 @@
             <div class="footer-grid">
                 <div class="footer-about">
                     <div class="footer-logo">
-                        <img src="<?php echo asset_url('images/logo-white.png'); ?>" alt="<?php echo e(get_setting('site_name')); ?> Logo" width="50" height="50">
+                        <img src="<?php echo e(branding_url('site_logo_white')); ?>" alt="<?php echo e(get_setting('site_name')); ?> Logo" width="50" height="50">
                         <span class="footer-logo-text"><?php echo e(get_setting('site_name', 'Urji Beri School')); ?></span>
                     </div>
                     <p>Providing quality preschool and elementary education for children ages 3-13. We nurture young minds in a safe, caring, and stimulating environment.</p>
@@ -79,6 +79,13 @@
                                     <?php echo e(get_setting('contact_phone')); ?>
                                 </a>
                             </li>
+                            <?php if (get_setting('contact_phone_2')): ?>
+                            <li>
+                                <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', get_setting('contact_phone_2')); ?>">
+                                    <?php echo e(get_setting('contact_phone_2')); ?>
+                                </a>
+                            </li>
+                            <?php endif; ?>
                             <li>
                                 <a href="mailto:<?php echo e(get_setting('contact_email')); ?>" itemprop="email">
                                     <?php echo e(get_setting('contact_email')); ?>
@@ -209,16 +216,16 @@
                     </div>
                 </div>
                 <div class="site-popup-promo-visual" aria-hidden="true">
-                    <div class="site-popup-stat"><strong>550+</strong><span>Happy Students</span></div>
-                    <div class="site-popup-stat"><strong>18+</strong><span>Years of Excellence</span></div>
-                    <div class="site-popup-stat"><strong>98%</strong><span>Parent Satisfaction</span></div>
+                    <div class="site-popup-stat"><strong><?php echo e(get_setting('stat_students', '550')); ?>+</strong><span>Happy Students</span></div>
+                    <div class="site-popup-stat"><strong><?php echo e(get_setting('stat_experience', '18')); ?>+</strong><span>Years of Excellence</span></div>
+                    <div class="site-popup-stat"><strong><?php echo e(get_setting('stat_programs', '98')); ?>%</strong><span>Parent Satisfaction</span></div>
                 </div>
             </div>
         </div>
     </div>
     
     <!-- Main JavaScript -->
-    <script src="<?php echo asset_url('js/main.js'); ?>?v=<?php echo time(); ?>"></script>
+    <script src="<?php echo asset_url('js/main.js'); ?>?v=<?php echo asset_version(ASSETS_PATH . '/js/main.js'); ?>"></script>
     <?php if (!empty($_SESSION['settings_updated'])): ?>
     <script>
         window.__settingsUpdated = true;
@@ -227,9 +234,9 @@
     
     <!-- PWA Install Prompt -->
     <div class="pwa-install-prompt hidden" id="pwaInstallPrompt">
-        <img src="<?php echo asset_url('images/logo.png'); ?>" alt="Urji Beri School">
+        <img src="<?php echo e(branding_url('site_logo')); ?>" alt="<?php echo e(get_setting('site_name', 'Urji Beri School')); ?>">
         <div class="pwa-install-content">
-            <h4>Install Urji Beri App</h4>
+            <h4>Install <?php echo e(get_setting('site_name', 'Urji Beri School')); ?></h4>
             <p>Add to home screen for quick access</p>
         </div>
         <div class="pwa-install-buttons">

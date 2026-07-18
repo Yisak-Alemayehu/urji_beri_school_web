@@ -13,12 +13,13 @@ $seoDefaults = [
     'title' => isset($pageTitle) ? $pageTitle . ' - ' . get_setting('site_name', 'Urji Beri School') : get_setting('site_name', 'Urji Beri School'),
     'description' => get_setting('site_description', 'Urji Beri School offers education for children aged 3 to 13. Its curriculum is based on the programs of the Ministry of Education and taught in Amharic and English language.'),
     'keywords' => get_setting('site_keywords', 'urji beri school, urji beri online result, urji beri result, urji beri report card, urji beri, urji beri furi, best school around furi, elementary school in furi'),
-    'image' => asset_url('images/og-image.jpg'),
+    'image' => branding_url('site_og_image'),
     'type' => 'website'
 ];
 
 // Merge with page-specific SEO if set
 $seo = isset($pageSeo) ? array_merge($seoDefaults, $pageSeo) : $seoDefaults;
+$siteNameShort = get_setting('site_name', 'Urji Beri School');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -38,10 +39,10 @@ $seo = isset($pageSeo) ? array_merge($seoDefaults, $pageSeo) : $seoDefaults;
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Urji Beri">
-    <meta name="application-name" content="Urji Beri School">
+    <meta name="apple-mobile-web-app-title" content="<?php echo e($siteNameShort); ?>">
+    <meta name="application-name" content="<?php echo e($siteNameShort); ?>">
     <meta name="site-url" content="<?php echo SITE_URL; ?>">
-    <meta name="msapplication-TileImage" content="<?php echo asset_url('images/icon-144.png'); ?>">
+    <meta name="msapplication-TileImage" content="<?php echo e(branding_url('site_icon_144')); ?>">
     
     <!-- Additional SEO Meta Tags -->
     <?php
@@ -59,11 +60,11 @@ $seo = isset($pageSeo) ? array_merge($seoDefaults, $pageSeo) : $seoDefaults;
     <link rel="alternate" hreflang="x-default" href="<?php echo e($canonicalPage); ?>">
     
     <!-- Favicon & App Icons -->
-    <link rel="icon" type="image/x-icon" href="<?php echo asset_url('images/favicon.ico'); ?>">
-    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo asset_url('images/favicon-32x32.png'); ?>">
-    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo asset_url('images/favicon-16x16.png'); ?>">
-    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo asset_url('images/apple-touch-icon.png'); ?>">
-    <link rel="manifest" href="<?php echo SITE_URL; ?>/manifest.json">
+    <link rel="icon" href="<?php echo e(branding_url('site_favicon')); ?>" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo e(branding_url('site_favicon_32')); ?>">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo e(branding_url('site_favicon_16')); ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo e(branding_url('site_apple_touch_icon')); ?>">
+    <link rel="manifest" href="<?php echo SITE_URL; ?>/manifest.php">
     
     <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,7 +75,7 @@ $seo = isset($pageSeo) ? array_merge($seoDefaults, $pageSeo) : $seoDefaults;
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Main Stylesheet -->
-    <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>?v=<?php echo asset_version(ASSETS_PATH . '/css/style.css'); ?>">
     
     <!-- JSON-LD Structured Data -->
     <?php echo generate_organization_schema(); ?>
@@ -106,7 +107,7 @@ $seo = isset($pageSeo) ? array_merge($seoDefaults, $pageSeo) : $seoDefaults;
         <div class="container">
             <div class="header-inner">
                 <a href="<?php echo route_url('home'); ?>" class="logo" title="<?php echo e(get_setting('site_name')); ?> - Home">
-                    <img src="<?php echo asset_url('images/logo.png'); ?>" alt="<?php echo e(get_setting('site_name')); ?> Logo" width="50" height="50">
+                    <img src="<?php echo e(branding_url('site_logo')); ?>" alt="<?php echo e(get_setting('site_name')); ?> Logo" width="50" height="50">
                     <span class="logo-text"><?php echo e(get_setting('site_name', 'Urji Beri School')); ?></span>
                 </a>
                 

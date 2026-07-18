@@ -51,7 +51,7 @@ $pageSeo = [
     'title' => $pageTitle . ' - ' . get_setting('site_name', 'Urji Beri School'),
     'description' => truncate($galleryDescription, 160),
     'keywords' => 'Urji Beri School gallery, school photos, ' . ($currentCategory ? $currentCategory['name'] . ', ' : '') . 'Alemgena school, student activities, school events Ethiopia',
-    'image' => asset_url('images/og-image.jpg'),
+    'image' => branding_url('site_og_image'),
     'type' => 'website',
     'canonical' => route_url('gallery', $categorySlug ? ['category' => $categorySlug] : []),
 ];

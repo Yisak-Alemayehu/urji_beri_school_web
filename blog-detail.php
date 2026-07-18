@@ -36,7 +36,7 @@ $pageTitle = $post['title'];
 
 // SEO Configuration for this blog post
 $postDescription = $post['excerpt'] ? $post['excerpt'] : truncate(strip_tags($post['content']), 160);
-$postImage = $post['featured_image'] ? upload_url('blog/' . $post['featured_image']) : asset_url('images/og-image.jpg');
+$postImage = $post['featured_image'] ? upload_url($post['featured_image'], 'blog') : branding_url('site_og_image');
 $postUrl = route_url('blog-detail', ['slug' => $post['slug']]);
 
 $pageSeo = [

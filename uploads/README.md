@@ -5,3 +5,4 @@
 # - blog/      : Blog post featured images
 # - gallery/   : Gallery images
 # - director/  : Director's photo
+# - branding/  : Logo, favicon, OG image, PWA icons

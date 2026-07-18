@@ -32,11 +32,11 @@ $unreadCount = $db->fetch("SELECT COUNT(*) as count FROM contact_messages WHERE 
     <title><?php echo isset($adminPageTitle) ? e($adminPageTitle) . ' - ' : ''; ?>Admin Dashboard | <?php echo e(get_setting('site_name')); ?></title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="<?php echo asset_url('images/favicon.ico'); ?>">
-    <link rel="apple-touch-icon" href="<?php echo asset_url('images/icon-192.png'); ?>">
+    <link rel="icon" href="<?php echo e(branding_url('site_favicon')); ?>" sizes="any">
+    <link rel="apple-touch-icon" href="<?php echo e(branding_url('site_icon_192')); ?>">
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="<?php echo ADMIN_URL; ?>/manifest.json">
+    <link rel="manifest" href="<?php echo ADMIN_URL; ?>/manifest.php">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,8 +44,8 @@ $unreadCount = $db->fetch("SELECT COUNT(*) as count FROM contact_messages WHERE 
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo asset_url('css/admin.css'); ?>?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>?v=<?php echo asset_version(ASSETS_PATH . '/css/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset_url('css/admin.css'); ?>?v=<?php echo asset_version(ASSETS_PATH . '/css/admin.css'); ?>">
 </head>
 <body class="admin-app">
     <div class="admin-wrapper">
@@ -56,7 +56,7 @@ $unreadCount = $db->fetch("SELECT COUNT(*) as count FROM contact_messages WHERE 
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="admin-sidebar-header">
                 <a href="<?php echo ADMIN_URL; ?>" class="admin-logo">
-                    <img src="<?php echo asset_url('images/logo.png'); ?>" alt="<?php echo e(get_setting('site_name')); ?>">
+                    <img src="<?php echo e(branding_url('site_logo')); ?>" alt="<?php echo e(get_setting('site_name')); ?>">
                     <span class="admin-logo-text">
                         <span class="admin-logo-name"><?php echo e(get_setting('site_name')); ?></span>
                         <span class="admin-logo-badge">Admin Panel</span>

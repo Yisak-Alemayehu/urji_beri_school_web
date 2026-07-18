@@ -7,8 +7,11 @@
 // Base path definition
 define('BASE_PATH', dirname(__DIR__));
 
-// URL Configuration (update for production)
-define('SITE_URL', 'https://urjiberischool.test');
+// Load .env before other config
+require_once BASE_PATH . '/config/env.php';
+
+// URL Configuration
+define('SITE_URL', rtrim((string) env('SITE_URL', 'https://urjiberischool.test'), '/'));
 define('ADMIN_URL', SITE_URL . '/admin');
 
 // Directory paths
@@ -38,9 +41,15 @@ define('CSRF_TOKEN_NAME', 'csrf_token');
 // Timezone
 date_default_timezone_set('Africa/Addis_Ababa');
 
-// Error reporting (disable in production)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Error reporting (controlled by APP_DEBUG in .env)
+$appDebug = (bool) env('APP_DEBUG', false);
+if ($appDebug) {
+    error_reporting(E_ALL);
+    ini_set('display_errors', '1');
+} else {
+    error_reporting(0);
+    ini_set('display_errors', '0');
+}
 
 // Include database configuration
 require_once CONFIG_PATH . '/database.php';

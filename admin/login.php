@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Admin Login | <?php echo e(get_setting('site_name')); ?></title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="<?php echo asset_url('images/favicon.ico'); ?>">
+    <link rel="icon" href="<?php echo e(branding_url('site_favicon')); ?>" sizes="any">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,15 +53,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>">
-    <link rel="stylesheet" href="<?php echo asset_url('css/admin.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset_url('css/style.css'); ?>?v=<?php echo asset_version(ASSETS_PATH . '/css/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo asset_url('css/admin.css'); ?>?v=<?php echo asset_version(ASSETS_PATH . '/css/admin.css'); ?>">
 </head>
 <body class="admin-app">
     <div class="login-page">
         <div class="login-container">
             <div class="login-card">
                 <div class="login-header">
-                    <img src="<?php echo asset_url('images/logo.png'); ?>" alt="<?php echo e(get_setting('site_name')); ?>" class="login-logo">
+                    <img src="<?php echo e(branding_url('site_logo')); ?>" alt="<?php echo e(get_setting('site_name')); ?>" class="login-logo">
                     <h1 class="login-title">Admin Sign In</h1>
                     <p class="login-subtitle">Enter your credentials to manage <?php echo e(get_setting('site_name')); ?>.</p>
                 </div>

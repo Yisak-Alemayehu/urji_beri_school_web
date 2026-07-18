@@ -19,7 +19,7 @@ class Router {
             ['pattern' => 'director', 'file' => 'director.php', 'page' => 'director'],
             ['pattern' => 'gallery', 'file' => 'gallery.php', 'page' => 'gallery'],
             ['pattern' => 'blog', 'file' => 'blog.php', 'page' => 'blog'],
-            ['pattern' => '', 'file' => 'index.php', 'page' => 'index'],
+            ['pattern' => '', 'file' => 'home.php', 'page' => 'index'],
         ];
     }
 
